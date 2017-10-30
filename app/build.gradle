@@ -16,7 +16,9 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.jakewharton.hugo'
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
 }
 
 static def gitBranch() {
@@ -59,6 +61,7 @@ android {
         }
     }
     packagingOptions {
+        exclude 'META-INF/ASL2.0'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
@@ -124,4 +127,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
+
+    compile 'com.couchbase.lite:couchbase-lite-android:1.4.0'
+    compile 'com.github.d-max:spots-dialog:0.7@aar'
 }
