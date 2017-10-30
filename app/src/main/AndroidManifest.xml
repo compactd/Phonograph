@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.kabouzeid.gramophone"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.kabouzeid.gramophone">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -12,6 +12,11 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.android.vending.BILLING" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:name=".App"
@@ -109,6 +114,9 @@
             android:name=".ui.activities.AboutActivity"
             android:label="@string/action_about" />
         <activity
+            android:name=".ui.activities.LoginActivity"
+            android:label="@string/action_login" />
+        <activity
             android:name=".ui.activities.intro.AppIntroActivity"
             android:label="@string/intro_label"
             android:theme="@style/Theme.Intro" />
@@ -202,7 +210,8 @@
                 android:resource="@xml/app_widget_card_info" />
         </receiver>
 
-        <activity android:name=".ui.activities.PurchaseActivity"></activity>
+        <activity android:name=".ui.activities.PurchaseActivity" />
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}"
@@ -210,8 +219,12 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>

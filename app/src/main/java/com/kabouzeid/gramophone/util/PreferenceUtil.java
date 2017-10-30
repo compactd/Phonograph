@@ -3,6 +3,7 @@ package com.kabouzeid.gramophone.util;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Shader;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
@@ -15,6 +16,10 @@ import com.kabouzeid.gramophone.ui.fragments.player.NowPlayingScreen;
 import java.io.File;
 
 public final class PreferenceUtil {
+    public static final String SESSION_TOKEN = "session_token";
+    public static final String LAST_SERVER_URL = "last_server_url";
+    public static final String LAST_SERVER_USERNAME = "last_server_username";
+
     public static final String GENERAL_THEME = "general_theme";
     public static final String DEFAULT_START_PAGE = "default_start_page";
     public static final String LAST_PAGE = "last_start_page";
@@ -423,5 +428,35 @@ public final class PreferenceUtil {
 
     public final boolean initializedBlacklist() {
         return mPreferences.getBoolean(INITIALIZED_BLACKLIST, false);
+    }
+
+    public final String sessionToken ()  {
+        return mPreferences.getString(SESSION_TOKEN, "");
+    }
+
+    public final void setSessionToken (String token) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(SESSION_TOKEN, token);
+        editor.apply();
+    }
+
+    public final String lastServerURL () {
+        return mPreferences.getString(LAST_SERVER_URL, "https://compactd.io/");
+    }
+
+    public final void setLastServerUrl (String url) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(LAST_SERVER_URL, url);
+        editor.apply();
+    }
+
+    public final String lastServerUsername () {
+        return mPreferences.getString(LAST_SERVER_USERNAME, "admin");
+    }
+
+    public final void setLastServerUsername (String username) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(LAST_SERVER_USERNAME, username);
+        editor.apply();
     }
 }

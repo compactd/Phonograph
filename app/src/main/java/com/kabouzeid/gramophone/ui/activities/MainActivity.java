@@ -2,6 +2,7 @@ package com.kabouzeid.gramophone.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -47,15 +48,20 @@ import com.kabouzeid.gramophone.util.PreferenceUtil;
 import com.kabouzeid.gramophone.util.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import dmax.dialog.SpotsDialog;
+import io.compactd.compactd.Authenticator;
+
 public class MainActivity extends AbsSlidingMusicPanelActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final int APP_INTRO_REQUEST = 100;
+    public static final int LOGIN_REQUEST = 420;
     public static final int PURCHASE_REQUEST = 101;
 
     private static final int LIBRARY = 0;
@@ -107,6 +113,18 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
         if (!checkShowIntro()) {
             checkShowChangelog();
         }
+
+        checkIsConnected();
+//        final AlertDialog dialog = new SpotsDialog(this);
+//        dialog.show();
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                dialog.hide();
+//            }
+//        }, 5000);
+
     }
 
     private void setMusicChooser(int key) {
@@ -395,6 +413,20 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             }, 50);
             return true;
         }
+        return false;
+    }
+
+    private boolean checkIsConnected () {
+        if (new Authenticator().isTokenValid(PreferenceUtil.getInstance(this).sessionToken())){
+            return true;
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivityForResult(new Intent(MainActivity.this, LoginActivity.class), LOGIN_REQUEST);
+            }
+        }, 50);
+
         return false;
     }
 
