@@ -26,6 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.kabouzeid.appthemehelper.ThemeStore;
 import com.kabouzeid.appthemehelper.util.ATHUtil;
 import com.kabouzeid.appthemehelper.util.NavigationViewUtil;
@@ -48,6 +51,8 @@ import com.kabouzeid.gramophone.util.PreferenceUtil;
 import com.kabouzeid.gramophone.util.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -56,6 +61,7 @@ import butterknife.ButterKnife;
 
 import dmax.dialog.SpotsDialog;
 import io.compactd.compactd.Authenticator;
+import io.compactd.compactd.CompactdSync;
 
 public class MainActivity extends AbsSlidingMusicPanelActivity {
 
@@ -115,16 +121,52 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
         }
 
         checkIsConnected();
-//        final AlertDialog dialog = new SpotsDialog(this);
-//        dialog.show();
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                dialog.hide();
-//            }
-//        }, 5000);
 
+        syncDatabases();
+
+    }
+
+    private void syncDatabases() {
+
+        final AlertDialog dialog = new SpotsDialog(this);
+        dialog.show();
+
+        try {
+            CompactdSync sync = new CompactdSync(
+                    PreferenceUtil.getInstance(this).sessionToken(),
+                    PreferenceUtil.getInstance(this).lastServerURL(),
+                    this
+            );
+            sync.addEventListener(new CompactdSync.SyncEventListener() {
+                @Override
+                public void finished() {
+                    dialog.hide();
+                }
+
+                @Override
+                public void databaseSyncStarted(String database) {
+
+                }
+
+                @Override
+                public void databaseSyncFinished(String database) {
+
+                }
+
+                @Override
+                public void onCouchException(CouchbaseLiteException exc) {
+
+                }
+
+                @Override
+                public void onURLException(MalformedURLException exc) {
+
+                }
+            });
+            sync.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setMusicChooser(int key) {

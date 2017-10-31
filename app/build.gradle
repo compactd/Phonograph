@@ -130,4 +130,7 @@ dependencies {
 
     compile 'com.couchbase.lite:couchbase-lite-android:1.4.0'
     compile 'com.github.d-max:spots-dialog:0.7@aar'
+
+    debugCompile 'com.readystatesoftware.chuck:library:1.1.0'
+    releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.1.0'
 }

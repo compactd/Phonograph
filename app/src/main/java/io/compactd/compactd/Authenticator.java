@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.Date;
 
 /**
  * Created by Vincent on 30/10/2017.
@@ -52,5 +51,11 @@ public class Authenticator {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public String getUserFromToken (String token) throws UnsupportedEncodingException, JSONException {
+
+        JSONObject decoded = decode(token);
+        return decoded.getString("user");
     }
 }
