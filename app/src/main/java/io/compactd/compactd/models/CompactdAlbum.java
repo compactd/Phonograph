@@ -47,6 +47,7 @@ public class CompactdAlbum extends CompactdModel{
         Document doc = db.getDocument(mId);
 
         Map<String, Object> props = new HashMap<>();
+        Log.d(TAG, "fetch: " + doc.toString());
         props.putAll(doc.getProperties());
 
         CompactdArtist artist = new CompactdArtist(mManager, (String) props.get("artist"));

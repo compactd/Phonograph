@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.session.MediaSession;
 import android.os.Binder;
@@ -32,12 +33,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.ManagerOptions;
+import com.couchbase.lite.android.AndroidContext;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.appwidgets.AppWidgetBig;
 import com.kabouzeid.gramophone.appwidgets.AppWidgetCard;
@@ -62,10 +67,16 @@ import com.kabouzeid.gramophone.util.MusicUtil;
 import com.kabouzeid.gramophone.util.PreferenceUtil;
 import com.kabouzeid.gramophone.util.Util;
 
+import org.json.JSONObject;
+
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import io.compactd.compactd.CompactdRequest;
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid), Andrew Neal
@@ -494,11 +505,25 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
             return prepared;
         }
     }
-
     private boolean openCurrent() {
         synchronized (this) {
             try {
-                return playback.setDataSource(getTrackUri(getCurrentSong()));
+                Song song = getCurrentSong();
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
+                Manager manager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
+                URL url = new URL(preferenceUtil.lastServerURL());
+                CompactdRequest req = new CompactdRequest(url, "/api/boombox/direct");
+                req.setSessionToken(preferenceUtil.sessionToken());
+                JSONObject data = new JSONObject();
+                Log.d(TAG, "openCurrent: "+song.id);
+
+                data.put("track", CompactdTrack.findById(manager, song.id).getId());
+                JSONObject res = req.post(data);
+                String token = res.getString("token");
+
+                int nextPosition = getNextPosition(false);
+                Log.d(TAG, "openCurrent: set " + url.toString() + "/api/boombox/stream/" + token);
+                return playback.setDataSource(url.toString() + "/api/boombox/stream/" + token);
             } catch (Exception e) {
                 return false;
             }
@@ -513,11 +538,27 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
     private boolean prepareNextImpl() {
         synchronized (this) {
             try {
+                Song song = getSongAt(nextPosition);
+                if (song.id == -1) return false;
+                PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
+                Manager manager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
+                URL url = new URL(preferenceUtil.lastServerURL());
+                CompactdRequest req = new CompactdRequest(url, "/api/boombox/direct");
+                req.setSessionToken(preferenceUtil.sessionToken());
+                JSONObject data = new JSONObject();
+                Log.d(TAG, "prepareNextImpl: "+song.id);
+
+                data.put("track", CompactdTrack.findById(manager, song.id).getId());
+                JSONObject res = req.post(data);
+                String token = res.getString("token");
+
                 int nextPosition = getNextPosition(false);
-                playback.setNextDataSource(getTrackUri(getSongAt(nextPosition)));
+                Log.d(TAG, "prepareNextImpl: prepare " + url.toString() + "/api/boombox/stream/" + token);
+                playback.setNextDataSource(url.toString() + "/api/boombox/stream/" + token);
                 this.nextPosition = nextPosition;
                 return true;
             } catch (Exception e) {
+                e.printStackTrace();
                 return false;
             }
         }

@@ -2,6 +2,8 @@ package io.compactd.compactd;
 
 import android.util.Log;
 
+import com.readystatesoftware.chuck.ChuckInterceptor;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -86,10 +88,16 @@ public class CompactdRequest {
         }
 
         RequestBody body = RequestBody.create(JSON, data.toString());
-        Request request = new Request.Builder()
+        Request.Builder requestBuilder = new Request.Builder()
                 .url(new URL(remote))
-                .post(body)
-                .build();
+                .post(body);
+
+
+        if (getSessionToken() != null) {
+            requestBuilder.addHeader("Authorization", "Bearer " + getSessionToken());
+        }
+        Request request = requestBuilder.build();
+
         Response response = client.newCall(request).execute();
 
         String raw = response.body().string();

@@ -16,6 +16,8 @@ import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.service.playback.Playback;
 import com.kabouzeid.gramophone.util.PreferenceUtil;
 
+import java.net.URI;
+
 /**
  * @author Andrew Neal, Karim Abou Zeid (kabouzeid)
  */
@@ -63,6 +65,7 @@ public class MultiPlayer implements Playback, MediaPlayer.OnErrorListener, Media
      * ready to play, false otherwise
      */
     private boolean setDataSourceImpl(@NonNull final MediaPlayer player, @NonNull final String path) {
+        Log.d(TAG, "setDataSourceImpl: " + path);
         if (context == null) {
             return false;
         }
@@ -71,8 +74,11 @@ public class MultiPlayer implements Playback, MediaPlayer.OnErrorListener, Media
             player.setOnPreparedListener(null);
             if (path.startsWith("content://")) {
                 player.setDataSource(context, Uri.parse(path));
+            } else if (path.startsWith("http")) {
+                player.setDataSource(context, Uri.parse(path));
             } else {
                 player.setDataSource(path);
+
             }
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.prepare();
