@@ -1,5 +1,7 @@
 package io.compactd.compactd.models;
 
+import android.util.Log;
+
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
@@ -7,6 +9,9 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryEnumerator;
 import com.couchbase.lite.QueryRow;
+import com.kabouzeid.gramophone.model.Album;
+import com.kabouzeid.gramophone.model.Artist;
+import com.kabouzeid.gramophone.model.Song;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,12 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by vinz243 on 30/10/2017.
  */
 
 public class CompactdArtist extends CompactdModel {
     public static final String DATABASE_NAME = "artists";
+    private static final String TAG = "CompactdArtist";
     private String name;
 
     public CompactdArtist(Manager manager, String id) {
@@ -78,6 +86,19 @@ public class CompactdArtist extends CompactdModel {
         props.put("name", splat[1]);
         return props;
     }
+
+    public Artist toArtist () {
+        ArrayList<Album> albums = new ArrayList<>();
+        try {
+            for (CompactdAlbum album : getAlbums()) {
+                albums.add(album.toAlbum());
+            }
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+        return new Artist(albums);
+    }
+
     public String getArtworkURI (URL base, int size) {
         String url = base.toString();
 
@@ -85,39 +106,84 @@ public class CompactdArtist extends CompactdModel {
 
         return url;
     }
+
     public static List<CompactdArtist> findAll (Manager manager) throws CouchbaseLiteException {
-        return findAll(manager, "library/");
+        return findAll(manager, "library/", true);
     }
-    public static List<CompactdArtist> findAll (Manager manager, String key) throws CouchbaseLiteException {
+    public static List<CompactdArtist> findAll (Manager manager, boolean fetch) throws CouchbaseLiteException {
+        return findAll(manager, "library/", fetch);
+    }
+
+    public static List<CompactdArtist> findAll (Manager manager, String key, boolean fetch) throws CouchbaseLiteException {
         Database db = manager.getDatabase(DATABASE_NAME);
         Query query = db.createAllDocumentsQuery();
-        query.setStartKeyDocId(key);
-        query.setEndKeyDocId(key + "\u0000");
+        query.setStartKey(key);
+        query.setEndKey(key + "\uffff");
         query.setAllDocsMode(Query.AllDocsMode.ALL_DOCS);
-
         List<CompactdArtist> artists = new ArrayList<>();
         QueryEnumerator result = query.run();
         while (result.hasNext()) {
             QueryRow row = result.next();
             CompactdArtist artist = new CompactdArtist(manager, row.getDocumentId());
-            artist.fetch();
+
+            if (fetch) {
+                artist.fetch();
+            } else {
+                artist.fromMap(row.getDocumentProperties());
+            }
             artists.add(artist);
         }
         return artists;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CompactdArtist that = (CompactdArtist) o;
-
-        return getName().equals(that.getName());
+    @Nullable
+    public static CompactdArtist findById (Manager manager, int id, boolean fetch)  {
+        List<CompactdArtist> artists = null;
+        try {
+            artists = findAll(manager, fetch);
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+            return null;
+        }
+        for (CompactdArtist artist : artists) {
+            if (artist.getId().hashCode() == id) {
+                if (fetch) {
+                    try {
+                        artist.fetch();
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+                return artist;
+            }
+        }
+        return null;
     }
 
-    @Override
-    public int hashCode() {
-        return getName().hashCode();
+    @Nullable
+    public static CompactdArtist findById (Manager manager, int id) {
+        return findById(manager, id, true);
+    }
+
+    @Nullable
+    public static CompactdArtist findById (Manager manager, String id, boolean fetch) {
+        if (fetch) {
+            CompactdArtist artist = new CompactdArtist(manager, id);
+            try {
+                artist.fetch();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return artist;
+        } else {
+            return findById(manager, id.hashCode(), false);
+        }
+    }
+
+    @Nullable
+    public static CompactdArtist findById (Manager manager, String id)  {
+        return findById(manager, id, true);
     }
 }

@@ -27,6 +27,9 @@ public class Authenticator {
 
     }
     private static JSONObject decode (String token) throws UnsupportedEncodingException, JSONException {
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
         String[] split = token.split("\\.");
         return new JSONObject(getJson(split[1]));
     }
@@ -40,6 +43,7 @@ public class Authenticator {
         Log.d(TAG, "isTokenValid: " + token);
         try {
             JSONObject decoded = decode(token);
+            if (decoded == null) return false;
             Log.d(TAG, "isTokenValid: " + decoded.toString());
             Log.d(TAG, "isTokenValid: checking exp against "+ (System.currentTimeMillis() + 1000 * 60 * 60) / 1000L);
             return (System.currentTimeMillis() + 1000 * 60 * 60) / 1000L <=

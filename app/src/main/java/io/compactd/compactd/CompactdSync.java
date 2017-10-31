@@ -18,6 +18,7 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +27,12 @@ import java.util.Map;
 import io.compactd.compactd.models.CompactdAlbum;
 import io.compactd.compactd.models.CompactdArtist;
 import io.compactd.compactd.models.CompactdTrack;
+import okhttp3.CipherSuite;
+import okhttp3.ConnectionSpec;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
+import okhttp3.TlsVersion;
 ///**
 // * Created by Vincent on 30/10/2017.
 // */
@@ -138,8 +142,16 @@ public class CompactdSync {
         HttpClientFactory factory = new HttpClientFactory() {
             @Override
             public OkHttpClient getOkHttpClient() {
+                ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .cipherSuites(
+                                CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+                                CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+                                CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
+                        .build();
                 return new OkHttpClient.Builder()
                         .addInterceptor(new ChuckInterceptor(mContext))
+                        .connectionSpecs(Collections.singletonList(spec))
                         .build();
             }
 

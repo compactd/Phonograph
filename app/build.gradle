@@ -46,6 +46,8 @@ android {
         applicationId 'com.kabouzeid.gramophone'
         versionCode 141
         versionName '0.16.1'
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -128,9 +130,10 @@ dependencies {
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 
-    compile 'com.couchbase.lite:couchbase-lite-android:1.4.0'
-    compile 'com.github.d-max:spots-dialog:0.7@aar'
+    implementation 'com.couchbase.lite:couchbase-lite-android:1.4.0'
+    implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
-    debugCompile 'com.readystatesoftware.chuck:library:1.1.0'
-    releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.1.0'
+    debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
+    releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
+    implementation 'com.google.guava:guava:23.3-android'
 }

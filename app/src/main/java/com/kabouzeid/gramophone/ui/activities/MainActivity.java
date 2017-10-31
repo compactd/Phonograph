@@ -122,7 +122,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
 
         checkIsConnected();
 
-        syncDatabases();
+        // syncDatabases();
 
     }
 
@@ -140,7 +140,12 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             sync.addEventListener(new CompactdSync.SyncEventListener() {
                 @Override
                 public void finished() {
-                    dialog.hide();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.hide();
+                        }
+                    });
                 }
 
                 @Override

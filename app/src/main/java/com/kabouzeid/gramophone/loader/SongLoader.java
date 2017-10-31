@@ -7,12 +7,21 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.android.AndroidContext;
 import com.kabouzeid.gramophone.model.Song;
 import com.kabouzeid.gramophone.provider.BlacklistStore;
 import com.kabouzeid.gramophone.util.PreferenceUtil;
 
+import org.w3c.dom.Text;
+
+import java.io.IOException;
 import java.util.ArrayList;
+
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -90,6 +99,8 @@ public class SongLoader {
 
     @Nullable
     public static Cursor makeSongCursor(@NonNull final Context context, @Nullable String selection, String[] selectionValues, final String sortOrder) {
+        Log.d("SongLoader", "makeSongCursor: selection=" + selection + "; selectionValues="
+                + (selectionValues != null ? TextUtils.join(", ", selectionValues) : "null") + "; sortOrder=" + sortOrder);
         if (selection != null && !selection.trim().equals("")) {
             selection = BASE_SELECTION + " AND " + selection;
         } else {
@@ -104,22 +115,11 @@ public class SongLoader {
         }
 
         try {
-            return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{
-                            BaseColumns._ID,// 0
-                            AudioColumns.TITLE,// 1
-                            AudioColumns.TRACK,// 2
-                            AudioColumns.YEAR,// 3
-                            AudioColumns.DURATION,// 4
-                            AudioColumns.DATA,// 5
-                            AudioColumns.DATE_MODIFIED,// 6
-                            AudioColumns.ALBUM_ID,// 7
-                            AudioColumns.ALBUM,// 8
-                            AudioColumns.ARTIST_ID,// 9
-                            AudioColumns.ARTIST,// 10
-
-                    }, selection, selectionValues, sortOrder);
+            return CompactdTrack.makeCursor(new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS));
         } catch (SecurityException e) {
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
