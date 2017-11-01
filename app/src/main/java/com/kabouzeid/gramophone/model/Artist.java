@@ -6,26 +6,33 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
+import io.compactd.compactd.models.CompactdArtist;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
 public class Artist implements Parcelable {
     public final ArrayList<Album> albums;
+    public CompactdArtist artist;
 
-    public Artist(ArrayList<Album> albums) {
+    public Artist(ArrayList<Album> albums, CompactdArtist artist) {
         this.albums = albums;
+        this.artist = artist;
     }
 
-    public Artist() {
-        this.albums = new ArrayList<>();
+    public Artist(ArrayList<Album> albums) {
+        this(albums, null);
+    }
+    public Artist () {
+        this(new ArrayList<Album>());
     }
 
     public int getId() {
-        return safeGetFirstAlbum().getArtistId();
+        return artist.getId().hashCode();
     }
 
     public String getName() {
-        return safeGetFirstAlbum().getArtistName();
+        return artist.getName();
     }
 
     public int getSongCount() {
@@ -66,7 +73,7 @@ public class Artist implements Parcelable {
 
     @Override
     public int hashCode() {
-        return albums != null ? albums.hashCode() : 0;
+        return 13 * artist.getId().hashCode() + 420;
     }
 
     @Override

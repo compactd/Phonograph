@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 /**
+ * comment this function saves an image for a specific artistx
  * @author Karim Abou Zeid (kabouzeid)
  */
 

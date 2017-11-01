@@ -87,6 +87,15 @@ public class CompactdArtist extends CompactdModel {
         return props;
     }
 
+    public String getImagePath (int size) {
+        if (size <= 0) {
+            Log.d(TAG, "getImagePath: size is less than 0, setting to 300");
+            size = 300;
+        }
+        String uriName = getURIProps().get("name");
+        return "/api/aquarelle/" + uriName + "?s=" + size;
+    }
+
     public Artist toArtist () {
         ArrayList<Album> albums = new ArrayList<>();
         try {
@@ -96,7 +105,7 @@ public class CompactdArtist extends CompactdModel {
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
-        return new Artist(albums);
+        return new Artist(albums, this);
     }
 
     public String getArtworkURI (URL base, int size) {

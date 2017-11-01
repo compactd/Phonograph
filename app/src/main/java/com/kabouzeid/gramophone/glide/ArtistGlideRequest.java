@@ -3,6 +3,7 @@ package com.kabouzeid.gramophone.glide;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.DrawableRequestBuilder;
@@ -12,6 +13,7 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.kabouzeid.gramophone.App;
 import com.kabouzeid.gramophone.R;
@@ -21,6 +23,8 @@ import com.kabouzeid.gramophone.glide.palette.BitmapPaletteWrapper;
 import com.kabouzeid.gramophone.model.Artist;
 import com.kabouzeid.gramophone.util.ArtistSignatureUtil;
 import com.kabouzeid.gramophone.util.CustomArtistImageUtil;
+
+import io.compactd.compactd.models.CompactdArtist;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -70,6 +74,18 @@ public class ArtistGlideRequest {
                     .diskCacheStrategy(DEFAULT_DISK_CACHE_STRATEGY)
                     .error(DEFAULT_ERROR_IMAGE)
                     .animate(DEFAULT_ANIMATION)
+                    .listener(new RequestListener() {
+                        @Override
+                        public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+                            e.printStackTrace();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .priority(Priority.LOW)
                     .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                     .signature(createSignature(artist));
@@ -90,6 +106,18 @@ public class ArtistGlideRequest {
                     .diskCacheStrategy(DEFAULT_DISK_CACHE_STRATEGY)
                     .error(DEFAULT_ERROR_IMAGE)
                     .animate(DEFAULT_ANIMATION)
+                    .listener(new RequestListener() {
+                        @Override
+                        public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+                            e.printStackTrace();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .priority(Priority.LOW)
                     .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                     .signature(createSignature(builder.artist));
@@ -114,6 +142,18 @@ public class ArtistGlideRequest {
                     .error(DEFAULT_ERROR_IMAGE)
                     .animate(DEFAULT_ANIMATION)
                     .priority(Priority.LOW)
+                    .listener(new RequestListener() {
+                        @Override
+                        public boolean onException(Exception e, Object model, Target target, boolean isFirstResource) {
+                            e.printStackTrace();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Object resource, Object model, Target target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
                     .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                     .signature(createSignature(builder.artist));
         }
@@ -122,7 +162,7 @@ public class ArtistGlideRequest {
     public static DrawableTypeRequest createBaseRequest(RequestManager requestManager, Artist artist, boolean noCustomImage, boolean forceDownload) {
         boolean hasCustomImage = CustomArtistImageUtil.getInstance(App.getInstance()).hasCustomArtistImage(artist);
         if (noCustomImage || !hasCustomImage) {
-            return requestManager.load(new ArtistImage(artist.getName(), forceDownload));
+            return requestManager.load(new ArtistImage(artist.artist, forceDownload));
         } else {
             return requestManager.load(CustomArtistImageUtil.getFile(artist));
         }

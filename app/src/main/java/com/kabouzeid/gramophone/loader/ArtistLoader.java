@@ -56,7 +56,6 @@ public class ArtistLoader {
 
     @NonNull
     public static ArrayList<Artist> getArtists(@NonNull final Context context, final String query) {
-        Log.d(TAG, "getArtists: " + query);
         ArrayList<Artist> artists = new ArrayList<>();
         try {
             List<CompactdArtist> compactdArtists = CompactdArtist.findAll(new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS));
