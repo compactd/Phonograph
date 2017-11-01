@@ -43,9 +43,9 @@ android {
         renderscriptTargetApi 27
         vectorDrawables.useSupportLibrary = true
 
-        applicationId 'com.kabouzeid.gramophone'
-        versionCode 141
-        versionName '0.16.1'
+        applicationId 'com.compactd.compactdplayer'
+        versionCode 1
+        versionName '0.1.0-1'
 
         multiDexEnabled true
     }
