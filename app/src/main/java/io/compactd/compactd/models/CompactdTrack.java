@@ -52,10 +52,10 @@ public class CompactdTrack extends CompactdModel {
 
     private int getMillisDurationFromSeconds (Object ms) {
         if (ms instanceof  Double) {
-            return (int) Math.floor((Double) ms * 1000);
+            return (int) Math.floor((Double) ms);
         }
         if (ms instanceof  Integer) {
-            return (int) Math.floor((Integer) ms * 1000);
+            return (int) Math.floor((Integer) ms);
         }
         return 0;
     }
