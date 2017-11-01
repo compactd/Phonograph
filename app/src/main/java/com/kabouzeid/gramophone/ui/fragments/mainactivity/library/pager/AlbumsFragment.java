@@ -17,10 +17,12 @@ import com.kabouzeid.gramophone.util.PreferenceUtil;
 
 import java.util.ArrayList;
 
+import io.compactd.compactd.CompactdSync;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class AlbumsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<AlbumAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Album>> {
+public class AlbumsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<AlbumAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Album>>,CompactdSync.DatabaseChangedListener {
     public static final String TAG = AlbumsFragment.class.getSimpleName();
 
     private static final int LOADER_ID = LoaderIds.ALBUMS_FRAGMENT;
@@ -42,6 +44,7 @@ public class AlbumsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFra
         int itemLayoutRes = getItemLayoutRes();
         notifyLayoutResChanged(itemLayoutRes);
         ArrayList<Album> dataSet = getAdapter() == null ? new ArrayList<Album>() : getAdapter().getDataSet();
+        CompactdSync.getInstance(getContext()).subscribe(this);
         return new AlbumAdapter(
                 this.getContext(),
                 getLibraryFragment().getMainActivity(),
@@ -98,7 +101,7 @@ public class AlbumsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFra
     }
 
     @Override
-    public void onMediaStoreChanged() {
+    public void onDatabaseChanged() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 

@@ -7,6 +7,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.adapter.artist.ArtistAdapter;
 import com.kabouzeid.gramophone.interfaces.LoaderIds;
@@ -15,12 +16,15 @@ import com.kabouzeid.gramophone.misc.WrappedAsyncTaskLoader;
 import com.kabouzeid.gramophone.model.Artist;
 import com.kabouzeid.gramophone.util.PreferenceUtil;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+
+import io.compactd.compactd.CompactdSync;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<ArtistAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Artist>> {
+public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<ArtistAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Artist>>,CompactdSync.DatabaseChangedListener {
 
     public static final String TAG = ArtistsFragment.class.getSimpleName();
 
@@ -30,6 +34,8 @@ public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFr
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(LOADER_ID, null, this);
+
+        CompactdSync.getInstance(this.getContext()).subscribe(this);
     }
 
     @NonNull
@@ -44,6 +50,7 @@ public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFr
         int itemLayoutRes = getItemLayoutRes();
         notifyLayoutResChanged(itemLayoutRes);
         ArrayList<Artist> dataSet = getAdapter() == null ? new ArrayList<Artist>() : getAdapter().getDataSet();
+
         return new ArtistAdapter(
                 getLibraryFragment().getMainActivity(),
                 dataSet,
@@ -55,11 +62,6 @@ public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFr
     @Override
     protected int getEmptyMessage() {
         return R.string.no_artists;
-    }
-
-    @Override
-    public void onMediaStoreChanged() {
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
@@ -121,6 +123,11 @@ public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFr
         getAdapter().swapDataSet(new ArrayList<Artist>());
     }
 
+    @Override
+    public void onDatabaseChanged() {
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
     private static class AsyncArtistLoader extends WrappedAsyncTaskLoader<ArrayList<Artist>> {
         public AsyncArtistLoader(Context context) {
             super(context);
@@ -129,6 +136,11 @@ public class ArtistsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFr
         @Override
         public ArrayList<Artist> loadInBackground() {
             return ArtistLoader.getAllArtists(getContext());
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            super.finalize();
         }
     }
 }

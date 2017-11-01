@@ -2,6 +2,7 @@ package com.kabouzeid.gramophone.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -116,30 +117,46 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             restoreCurrentFragment();
         }
 
-        if (!checkShowIntro()) {
+        if (!checkShowIntro ()) {
             checkShowChangelog();
         }
 
-        checkIsConnected();
+        checkIsConnected ();
 
-        // syncDatabases();
+        syncDatabases ();
 
     }
-
     private void syncDatabases() {
+        syncDatabases(true);
+    }
+    private void syncDatabases(boolean wait) {
+        if (PreferenceUtil.getInstance(this).sessionToken().isEmpty()) return;
 
         final AlertDialog dialog = new SpotsDialog(this);
-        dialog.show();
+        final boolean firstSync = PreferenceUtil.getInstance(this).lastDatabaseSync().getTime() == 0;
 
-        try {
-            CompactdSync sync = new CompactdSync(
-                    PreferenceUtil.getInstance(this).sessionToken(),
-                    PreferenceUtil.getInstance(this).lastServerURL(),
-                    this
-            );
-            sync.addEventListener(new CompactdSync.SyncEventListener() {
+        if (firstSync) {
+            dialog.show ();
+        } else if (wait) {
+            new Handler().postDelayed(new Runnable() {
                 @Override
-                public void finished() {
+                public void run() {
+                    syncDatabases(false);
+                }
+            }, 4200);
+            return;
+        }
+
+
+        CompactdSync sync = CompactdSync.getInstance(this);
+        sync.setURL(PreferenceUtil.getInstance(this).lastServerURL());
+        sync.setToken(PreferenceUtil.getInstance(this).sessionToken());
+
+        sync.subscribe(new CompactdSync.DatabaseChangedListener() {
+
+            @Override
+            public void onDatabaseChanged() {
+                if (firstSync) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -148,30 +165,10 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
                     });
                 }
 
-                @Override
-                public void databaseSyncStarted(String database) {
-
-                }
-
-                @Override
-                public void databaseSyncFinished(String database) {
-
-                }
-
-                @Override
-                public void onCouchException(CouchbaseLiteException exc) {
-
-                }
-
-                @Override
-                public void onURLException(MalformedURLException exc) {
-
-                }
-            });
-            sync.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                PreferenceUtil.getInstance(MainActivity.this).setLastDatabaseSync();
+            }
+        });
+        sync.start();
     }
 
     private void setMusicChooser(int key) {
@@ -210,11 +207,22 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             blockRequestPermissions = false;
             if (!hasPermissions()) {
                 requestPermissions();
+                syncDatabases();
             }
             checkSetUpPro(); // good chance that pro version check was delayed on first start
         } else if (requestCode == PURCHASE_REQUEST) {
             if (resultCode == RESULT_OK) {
+                syncDatabases();
                 checkSetUpPro();
+            }
+        } else if (requestCode == LOGIN_REQUEST) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                syncDatabases();
+//                this.recreate();
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // some stuff that will happen if there's no result
             }
         }
     }

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -66,11 +67,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private EditText mUrlView;
     private PreferenceUtil mPreferenceUtil;
+    private Button mEmailSignInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+           getWindow().getDecorView()
+            .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
         mPreferenceUtil = PreferenceUtil.getInstance(this);
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
@@ -88,9 +95,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
             public void onClick(View view) {
                 attemptLogin();
             }
@@ -240,7 +246,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mEmailSignInButton.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -350,7 +356,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     mPreferenceUtil.setLastServerUsername(mEmail);
                     mPreferenceUtil.setLastServerUrl(mURL);
                     mPreferenceUtil.setSessionToken(mToken);
-                    finish();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent();
+                            setResult(MainActivity.LOGIN_REQUEST);
+                            finish();
+                        }
+                    });
                     break;
                 case PASSWORD:
                     mPasswordView.setError(getString(R.string.error_incorrect_password));

@@ -18,10 +18,12 @@ import com.kabouzeid.gramophone.util.PreferenceUtil;
 
 import java.util.ArrayList;
 
+import io.compactd.compactd.CompactdSync;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Song>> {
+public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFragment<SongAdapter, GridLayoutManager> implements LoaderManager.LoaderCallbacks<ArrayList<Song>>,CompactdSync.DatabaseChangedListener {
 
     public static final String TAG = SongsFragment.class.getSimpleName();
 
@@ -31,6 +33,7 @@ public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFrag
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(LOADER_ID, null, this);
+        CompactdSync.getInstance(getContext()).subscribe(this);
     }
 
     @NonNull
@@ -67,7 +70,7 @@ public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFrag
     }
 
     @Override
-    public void onMediaStoreChanged() {
+    public void onDatabaseChanged() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 

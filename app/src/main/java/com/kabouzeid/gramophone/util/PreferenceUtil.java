@@ -3,7 +3,6 @@ package com.kabouzeid.gramophone.util;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Shader;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
@@ -14,9 +13,12 @@ import com.kabouzeid.gramophone.ui.fragments.mainactivity.folders.FoldersFragmen
 import com.kabouzeid.gramophone.ui.fragments.player.NowPlayingScreen;
 
 import java.io.File;
+import java.util.Date;
 
 public final class PreferenceUtil {
     public static final String SESSION_TOKEN = "session_token";
+    public static final String LAST_DATABASE_SYNC = "last_dbsync";
+
     public static final String LAST_SERVER_URL = "last_server_url";
     public static final String LAST_SERVER_USERNAME = "last_server_username";
 
@@ -441,7 +443,7 @@ public final class PreferenceUtil {
     }
 
     public final String lastServerURL () {
-        return mPreferences.getString(LAST_SERVER_URL, "https://compactd.io/");
+        return mPreferences.getString(LAST_SERVER_URL, "");
     }
 
     public final void setLastServerUrl (String url) {
@@ -451,12 +453,22 @@ public final class PreferenceUtil {
     }
 
     public final String lastServerUsername () {
-        return mPreferences.getString(LAST_SERVER_USERNAME, "admin");
+        return mPreferences.getString(LAST_SERVER_USERNAME, "");
     }
 
     public final void setLastServerUsername (String username) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(LAST_SERVER_USERNAME, username);
         editor.apply();
+    }
+
+    public void setLastDatabaseSync () {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(LAST_DATABASE_SYNC, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    public Date lastDatabaseSync () {
+        return new Date(mPreferences.getLong(LAST_DATABASE_SYNC, 0));
     }
 }

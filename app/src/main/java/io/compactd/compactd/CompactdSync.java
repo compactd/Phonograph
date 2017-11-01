@@ -90,6 +90,7 @@ import okhttp3.TlsVersion;
 public class CompactdSync {
 
     private static final String TAG = "CompactdSync";
+    private static CompactdSync sInstance;
     private final String[] DATABASES = {
             CompactdArtist.DATABASE_NAME,
             CompactdAlbum.DATABASE_NAME,
@@ -101,20 +102,32 @@ public class CompactdSync {
     private String mURL;
     private List<SyncEventListener> mListeners = new ArrayList<SyncEventListener>();
 
+    public void setToken(String mToken) {
+        this.mToken = mToken;
+    }
+
+    public void setURL(String mURL) {
+        this.mURL = mURL;
+    }
+
     public interface SyncEventListener {
         public void finished ();
+        public void databaseChanged (String database);
         public void databaseSyncStarted (String database);
         public void databaseSyncFinished (String database);
         public void onCouchException (CouchbaseLiteException exc);
         public void onURLException (MalformedURLException exc);
     }
 
-    public CompactdSync(String token, String url, Context context) throws IOException {
-        this.mToken = token;
-        this.mURL = url;
+    public interface DatabaseChangedListener {
+        public void onDatabaseChanged ();
+    }
+
+    private CompactdSync(Context context) throws IOException {
         this.mContext = context;
         this.mManager = new Manager(new AndroidContext(context.getApplicationContext()), Manager.DEFAULT_OPTIONS);
     }
+
     public void start () {
         try {
             sync(0);
@@ -131,6 +144,43 @@ public class CompactdSync {
             }
 
         }
+    }
+    public void subscribe (final DatabaseChangedListener listener) {
+        this.addEventListener(new SyncEventListener() {
+            boolean changed;
+
+            @Override
+            public void finished() {
+                if (changed) {
+                    listener.onDatabaseChanged();
+                }
+            }
+
+            @Override
+            public void databaseChanged(String database) {
+                changed = true;
+            }
+
+            @Override
+            public void databaseSyncStarted(String database) {
+
+            }
+
+            @Override
+            public void databaseSyncFinished(String database) {
+
+            }
+
+            @Override
+            public void onCouchException(CouchbaseLiteException exc) {
+
+            }
+
+            @Override
+            public void onURLException(MalformedURLException exc) {
+
+            }
+        });
     }
     public void addEventListener (SyncEventListener l) {
         mListeners.add(l);
@@ -197,7 +247,12 @@ public class CompactdSync {
             @Override
             public void changed(Replication.ChangeEvent event) {
             Log.d(TAG, event.toString());
-            if (event.getTransition().getDestination().equals(ReplicationState.STOPPED)) {
+            if (event.getChangeCount() > 0) {
+                for (SyncEventListener listener : mListeners) {
+                    listener.databaseChanged(database);
+                }
+            }
+            if (event.getTransition() != null && event.getTransition().getDestination().equals(ReplicationState.STOPPED)) {
 
                if (index < DATABASES.length - 1) {
                    try {
@@ -233,4 +288,16 @@ public class CompactdSync {
         rep.start();
 
     }
+    public static CompactdSync getInstance(Context context) {
+        if (sInstance == null) {
+            try {
+                sInstance = new CompactdSync(context.getApplicationContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sInstance;
+    }
 }
+
+
