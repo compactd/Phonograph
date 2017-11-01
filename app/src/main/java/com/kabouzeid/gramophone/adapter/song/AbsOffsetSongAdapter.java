@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,12 +24,12 @@ public abstract class AbsOffsetSongAdapter extends SongAdapter {
     protected static final int OFFSET_ITEM = 0;
     protected static final int SONG = 1;
 
-    public AbsOffsetSongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
-        super(activity, dataSet, itemLayoutRes, usePalette, cabHolder);
+    public AbsOffsetSongAdapter(Context context, AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
+        super(context, dataSet, itemLayoutRes, usePalette, cabHolder, activity);
     }
 
-    public AbsOffsetSongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, boolean showSectionName) {
-        super(activity, dataSet, itemLayoutRes, usePalette, cabHolder, showSectionName);
+    public AbsOffsetSongAdapter(Context context, AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, boolean showSectionName) {
+        super(context, dataSet, itemLayoutRes, usePalette, cabHolder, showSectionName, activity);
     }
 
     @NonNull

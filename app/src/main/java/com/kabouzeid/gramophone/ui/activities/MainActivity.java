@@ -322,7 +322,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             }
             ((TextView) navigationDrawerHeader.findViewById(R.id.title)).setText(song.title);
             ((TextView) navigationDrawerHeader.findViewById(R.id.text)).setText(song.artistName);
-            SongGlideRequest.Builder.from(Glide.with(this), song)
+            SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this), song)
                     .checkIgnoreMediaStore(this).build()
                     .into(((ImageView) navigationDrawerHeader.findViewById(R.id.image)));
         } else {

@@ -35,7 +35,10 @@ import com.kabouzeid.gramophone.util.Util;
 public class PlayingNotificationImpl extends PlayingNotification {
 
     private Target<BitmapPaletteWrapper> target;
-
+    private Context context;
+    public PlayingNotificationImpl (Context context) {
+        this.context = context;
+    }
     @Override
     public synchronized void update() {
         stopped = false;
@@ -90,7 +93,7 @@ public class PlayingNotificationImpl extends PlayingNotification {
                 if (target != null) {
                     Glide.clear(target);
                 }
-                target = SongGlideRequest.Builder.from(Glide.with(service), song)
+                target = SongGlideRequest.Builder.from(context, Glide.with(service), song)
                         .checkIgnoreMediaStore(service)
                         .generatePalette(service).build()
                         .into(new SimpleTarget<BitmapPaletteWrapper>(bigNotificationImageSize, bigNotificationImageSize) {

@@ -98,12 +98,12 @@ public class PlaylistDetailActivity extends AbsSlidingMusicPanelActivity impleme
         ViewUtil.setUpFastScrollRecyclerViewColor(this, ((FastScrollRecyclerView) recyclerView), ThemeStore.accentColor(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (playlist instanceof AbsCustomPlaylist) {
-            adapter = new PlaylistSongAdapter(this, new ArrayList<Song>(), R.layout.item_list, false, this);
+            adapter = new PlaylistSongAdapter(this,this, new ArrayList<Song>(), R.layout.item_list, false, this);
             recyclerView.setAdapter(adapter);
         } else {
             recyclerViewDragDropManager = new RecyclerViewDragDropManager();
             final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
-            adapter = new OrderablePlaylistSongAdapter(this, new ArrayList<PlaylistSong>(), R.layout.item_list, false, this, new OrderablePlaylistSongAdapter.OnMoveItemListener() {
+            adapter = new OrderablePlaylistSongAdapter(this,this, new ArrayList<PlaylistSong>(), R.layout.item_list, false, this, new OrderablePlaylistSongAdapter.OnMoveItemListener() {
                 @Override
                 public void onMoveItem(int fromPosition, int toPosition) {
                     if (PlaylistsUtil.moveItem(PlaylistDetailActivity.this, playlist.id, fromPosition, toPosition)) {

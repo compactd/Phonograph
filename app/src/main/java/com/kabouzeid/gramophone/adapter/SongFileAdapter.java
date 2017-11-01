@@ -28,6 +28,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.compactd.compactd.models.CompactdAlbum;
+import io.compactd.compactd.models.CompactdArtist;
+
 public class SongFileAdapter extends AbsMultiSelectAdapter<SongFileAdapter.ViewHolder, File> implements FastScrollRecyclerView.SectionedAdapter {
 
     private static final int FILE = 0;
@@ -110,21 +113,22 @@ public class SongFileAdapter extends AbsMultiSelectAdapter<SongFileAdapter.ViewH
 
     @SuppressWarnings("ConstantConditions")
     protected void loadFileImage(File file, final ViewHolder holder) {
-        final int iconColor = ATHUtil.resolveColor(activity, R.attr.iconColor);
-        if (file.isDirectory()) {
-            holder.image.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
-            holder.image.setImageResource(R.drawable.ic_folder_white_24dp);
-        } else {
-            Drawable error = Util.getTintedVectorDrawable(activity, R.drawable.ic_file_music_white_24dp, iconColor);
-            Glide.with(activity)
-                    .load(new AudioFileCover(file.getPath()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .error(error)
-                    .placeholder(error)
-                    .animate(android.R.anim.fade_in)
-                    .signature(new MediaStoreSignature("", file.lastModified(), 0))
-                    .into(holder.image);
-        }
+        throw new Error("loadFileImage not implemented");
+//        final int iconColor = ATHUtil.resolveColor(activity, R.attr.iconColor);
+//        if (file.isDirectory()) {
+//            holder.image.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN);
+//            holder.image.setImageResource(R.drawable.ic_folder_white_24dp);
+//        } else {
+//            Drawable error = Util.getTintedVectorDrawable(activity, R.drawable.ic_file_music_white_24dp, iconColor);
+//            Glide.with(activity)
+//                    .load(new AudioFileCover(album))
+//                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                    .error(error)
+//                    .placeholder(error)
+//                    .animate(android.R.anim.fade_in)
+//                    .signature(new MediaStoreSignature("", file.lastModified(), 0))
+//                    .into(holder.image);
+//        }
     }
 
     public static String readableFileSize(long size) {

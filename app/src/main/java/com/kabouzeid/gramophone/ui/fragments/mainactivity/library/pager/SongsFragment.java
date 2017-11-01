@@ -49,6 +49,7 @@ public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFrag
 
         if (getGridSize() <= getMaxGridSizeForList()) {
             return new ShuffleButtonSongAdapter(
+                    this.getContext(),
                     getLibraryFragment().getMainActivity(),
                     dataSet,
                     itemLayoutRes,
@@ -56,11 +57,8 @@ public class SongsFragment extends AbsLibraryPagerRecyclerViewCustomGridSizeFrag
                     getLibraryFragment());
         }
         return new SongAdapter(
-                getLibraryFragment().getMainActivity(),
-                dataSet,
-                itemLayoutRes,
-                usePalette,
-                getLibraryFragment());
+                this.getContext(), dataSet, itemLayoutRes, usePalette, getLibraryFragment(), getLibraryFragment().getMainActivity()
+        );
     }
 
     @Override

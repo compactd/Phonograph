@@ -6,14 +6,21 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
+import io.compactd.compactd.models.CompactdAlbum;
+
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
 public class Album implements Parcelable {
     public final ArrayList<Song> songs;
+    public CompactdAlbum album;
 
-    public Album(ArrayList<Song> songs) {
+    public Album(ArrayList<Song> songs, CompactdAlbum album) {
         this.songs = songs;
+        this.album = album;
+    }
+    public Album(ArrayList<Song> songs) {
+        this(songs, null);
     }
 
     public Album() {

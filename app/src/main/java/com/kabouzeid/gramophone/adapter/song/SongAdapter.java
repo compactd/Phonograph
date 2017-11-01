@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -45,13 +46,15 @@ public class SongAdapter extends AbsMultiSelectAdapter<SongAdapter.ViewHolder, S
 
     protected boolean usePalette = false;
     protected boolean showSectionName = true;
+    private final Context context;
 
-    public SongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
-        this(activity, dataSet, itemLayoutRes, usePalette, cabHolder, true);
+    public SongAdapter(Context context, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, AppCompatActivity activity) {
+        this(context, dataSet, itemLayoutRes, usePalette, cabHolder, true, activity);
     }
 
-    public SongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, boolean showSectionName) {
+    public SongAdapter(Context context, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, boolean showSectionName, AppCompatActivity activity) {
         super(activity, cabHolder, R.menu.menu_media_selection);
+        this.context = context;
         this.activity = activity;
         this.dataSet = dataSet;
         this.itemLayoutRes = itemLayoutRes;
@@ -133,7 +136,7 @@ public class SongAdapter extends AbsMultiSelectAdapter<SongAdapter.ViewHolder, S
     protected void loadAlbumCover(Song song, final ViewHolder holder) {
         if (holder.image == null) return;
 
-        SongGlideRequest.Builder.from(Glide.with(activity), song)
+        SongGlideRequest.Builder.from(context, Glide.with(activity), song)
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(new PhonographColoredTarget(holder.image) {

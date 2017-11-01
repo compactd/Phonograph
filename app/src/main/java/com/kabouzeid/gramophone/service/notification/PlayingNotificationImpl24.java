@@ -2,6 +2,7 @@ package com.kabouzeid.gramophone.service.notification;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +31,10 @@ import static com.kabouzeid.gramophone.service.MusicService.ACTION_TOGGLE_PAUSE;
 
 public class PlayingNotificationImpl24 extends PlayingNotification {
 
+    private Context context;
+    public PlayingNotificationImpl24 (Context context) {
+        this.context = context;
+    }
     @Override
     public synchronized void update() {
         stopped = false;
@@ -58,7 +63,7 @@ public class PlayingNotificationImpl24 extends PlayingNotification {
         service.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                SongGlideRequest.Builder.from(Glide.with(service), song)
+                SongGlideRequest.Builder.from(context, Glide.with(service), song)
                         .checkIgnoreMediaStore(service)
                         .generatePalette(service).build()
                         .into(new SimpleTarget<BitmapPaletteWrapper>(bigNotificationImageSize, bigNotificationImageSize) {

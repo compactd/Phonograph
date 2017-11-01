@@ -94,7 +94,7 @@ public class AppWidgetBig extends BaseAppWidget {
                 if (target != null) {
                     Glide.clear(target);
                 }
-                target = SongGlideRequest.Builder.from(Glide.with(appContext), song)
+                target = SongGlideRequest.Builder.from(appContext,Glide.with(appContext), song)
                         .checkIgnoreMediaStore(appContext)
                         .asBitmap().build()
                         .into(new SimpleTarget<Bitmap>(widgetImageSize, widgetImageSize) {

@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.album;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +26,8 @@ import java.util.ArrayList;
 public class HorizontalAlbumAdapter extends AlbumAdapter {
     public static final String TAG = AlbumAdapter.class.getSimpleName();
 
-    public HorizontalAlbumAdapter(@NonNull AppCompatActivity activity, ArrayList<Album> dataSet, boolean usePalette, @Nullable CabHolder cabHolder) {
-        super(activity, dataSet, HorizontalAdapterHelper.LAYOUT_RES, usePalette, cabHolder);
+    public HorizontalAlbumAdapter(@NonNull Context context, @NonNull AppCompatActivity activity, ArrayList<Album> dataSet, boolean usePalette, @Nullable CabHolder cabHolder) {
+        super(context, activity, dataSet, HorizontalAdapterHelper.LAYOUT_RES, usePalette, cabHolder);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class HorizontalAlbumAdapter extends AlbumAdapter {
     protected void loadAlbumCover(Album album, final ViewHolder holder) {
         if (holder.image == null) return;
 
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+        SongGlideRequest.Builder.from(context, Glide.with(activity), album.safeGetFirstSong())
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(new PhonographColoredTarget(holder.image) {

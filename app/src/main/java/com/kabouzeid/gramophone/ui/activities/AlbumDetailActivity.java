@@ -168,7 +168,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
     }
 
     private void loadAlbumCover() {
-        SongGlideRequest.Builder.from(Glide.with(this), getAlbum().safeGetFirstSong())
+        SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this), getAlbum().safeGetFirstSong())
                 .checkIgnoreMediaStore(this)
                 .generatePalette(this).build()
                 .dontAnimate()
@@ -235,7 +235,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
     }
 
     private void setUpSongsAdapter() {
-        adapter = new AlbumSongAdapter(this, getAlbum().songs, R.layout.item_list, false, this);
+        adapter = new AlbumSongAdapter(this, this, getAlbum().songs, R.layout.item_list, false, this);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setAdapter(adapter);
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {

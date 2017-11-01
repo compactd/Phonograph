@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,8 +25,8 @@ public class PlaylistSongAdapter extends AbsOffsetSongAdapter {
 
     public static final String TAG = PlaylistSongAdapter.class.getSimpleName();
 
-    public PlaylistSongAdapter(AppCompatActivity activity, @NonNull ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
-        super(activity, dataSet, itemLayoutRes, usePalette, cabHolder, false);
+    public PlaylistSongAdapter(Context context, AppCompatActivity activity, @NonNull ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
+        super(context, activity, dataSet, itemLayoutRes, usePalette, cabHolder, false);
         overrideMultiSelectMenuRes(R.menu.menu_cannot_delete_single_songs_playlist_songs_selection);
     }
 

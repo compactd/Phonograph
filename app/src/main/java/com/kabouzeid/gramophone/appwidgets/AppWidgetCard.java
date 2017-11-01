@@ -34,6 +34,7 @@ public class AppWidgetCard extends BaseAppWidget {
     private static int imageSize = 0;
     private static float cardRadius = 0f;
     private Target<BitmapPaletteWrapper> target; // for cancellation
+    private Context context;
 
     public static synchronized AppWidgetCard getInstance() {
         if (mInstance == null) {
@@ -48,7 +49,7 @@ public class AppWidgetCard extends BaseAppWidget {
      */
     protected void defaultAppWidget(final Context context, final int[] appWidgetIds) {
         final RemoteViews appWidgetView = new RemoteViews(context.getPackageName(), R.layout.app_widget_card);
-
+        this.context = context;
         appWidgetView.setViewVisibility(R.id.media_titles, View.INVISIBLE);
         appWidgetView.setImageViewResource(R.id.image, R.drawable.default_album_art);
         appWidgetView.setImageViewBitmap(R.id.button_next, createBitmap(Util.getTintedVectorDrawable(context, R.drawable.ic_skip_next_white_24dp, MaterialValueHelper.getSecondaryTextColor(context, true)), 1f));
@@ -100,7 +101,7 @@ public class AppWidgetCard extends BaseAppWidget {
                 if (target != null) {
                     Glide.clear(target);
                 }
-                target = SongGlideRequest.Builder.from(Glide.with(service), song)
+                target = SongGlideRequest.Builder.from(context, Glide.with(service), song)
                         .checkIgnoreMediaStore(service)
                         .generatePalette(service).build()
                         .centerCrop()

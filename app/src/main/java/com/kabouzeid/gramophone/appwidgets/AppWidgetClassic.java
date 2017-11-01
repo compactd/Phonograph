@@ -93,7 +93,7 @@ public class AppWidgetClassic extends BaseAppWidget {
                 if (target != null) {
                     Glide.clear(target);
                 }
-                target = SongGlideRequest.Builder.from(Glide.with(appContext), song)
+                target = SongGlideRequest.Builder.from(appContext, Glide.with(appContext), song)
                         .checkIgnoreMediaStore(appContext)
                         .generatePalette(service).build()
                         .centerCrop()

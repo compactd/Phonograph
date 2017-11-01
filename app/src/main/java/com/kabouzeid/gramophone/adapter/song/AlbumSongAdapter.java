@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,8 +20,8 @@ public class AlbumSongAdapter extends SongAdapter {
 
     public static final String TAG = AlbumSongAdapter.class.getSimpleName();
 
-    public AlbumSongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
-        super(activity, dataSet, itemLayoutRes, usePalette, cabHolder);
+    public AlbumSongAdapter(Context context, AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
+        super(context, dataSet, itemLayoutRes, usePalette, cabHolder, activity);
     }
 
     @Override

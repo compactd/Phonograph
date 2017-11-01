@@ -12,9 +12,7 @@ import com.couchbase.lite.QueryRow;
 import com.kabouzeid.gramophone.model.Album;
 import com.kabouzeid.gramophone.model.Song;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +126,7 @@ public class CompactdAlbum extends CompactdModel{
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
-        return new Album(songs);
+        return new Album(songs, this);
     }
 
     @Nullable
@@ -180,5 +178,15 @@ public class CompactdAlbum extends CompactdModel{
     @Nullable
     public static CompactdAlbum findById (Manager manager, String id)  {
         return findById(manager, id, true);
+    }
+
+    public String getImagePath(int size) {
+        if (size <= 0) {
+            Log.d(TAG, "getImagePath: size is less than 0, setting to 300");
+            size = 300;
+        }
+        String uriName = getURIProps().get("name");
+        String uriArtist = getURIProps().get("artist");
+        return "/api/aquarelle/" + uriArtist + "/" + uriName + "?s=" + size;
     }
 }

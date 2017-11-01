@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -20,8 +21,8 @@ import java.util.ArrayList;
  */
 public class ShuffleButtonSongAdapter extends AbsOffsetSongAdapter {
 
-    public ShuffleButtonSongAdapter(AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
-        super(activity, dataSet, itemLayoutRes, usePalette, cabHolder);
+    public ShuffleButtonSongAdapter(Context context, AppCompatActivity activity, ArrayList<Song> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
+        super(context, activity, dataSet, itemLayoutRes, usePalette, cabHolder);
     }
 
     @Override

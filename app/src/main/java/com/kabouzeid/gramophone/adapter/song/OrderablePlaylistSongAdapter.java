@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.song;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,8 +32,8 @@ public class OrderablePlaylistSongAdapter extends PlaylistSongAdapter implements
 
     private OnMoveItemListener onMoveItemListener;
 
-    public OrderablePlaylistSongAdapter(@NonNull AppCompatActivity activity, @NonNull ArrayList<PlaylistSong> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, @Nullable OnMoveItemListener onMoveItemListener) {
-        super(activity, (ArrayList<Song>) (List) dataSet, itemLayoutRes, usePalette, cabHolder);
+    public OrderablePlaylistSongAdapter(Context context, @NonNull AppCompatActivity activity, @NonNull ArrayList<PlaylistSong> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder, @Nullable OnMoveItemListener onMoveItemListener) {
+        super(context , activity, (ArrayList<Song>) (List) dataSet, itemLayoutRes, usePalette, cabHolder);
         overrideMultiSelectMenuRes(R.menu.menu_playlists_songs_selection);
         this.onMoveItemListener = onMoveItemListener;
     }

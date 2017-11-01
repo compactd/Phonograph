@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter.album;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -38,14 +39,16 @@ public class AlbumAdapter extends AbsMultiSelectAdapter<AlbumAdapter.ViewHolder,
     public static final String TAG = AlbumAdapter.class.getSimpleName();
 
     protected final AppCompatActivity activity;
+    protected final Context context;
     protected ArrayList<Album> dataSet;
 
     protected int itemLayoutRes;
 
     protected boolean usePalette = false;
 
-    public AlbumAdapter(@NonNull AppCompatActivity activity, ArrayList<Album> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
+    public AlbumAdapter(@NonNull Context context, @NonNull AppCompatActivity activity, ArrayList<Album> dataSet, @LayoutRes int itemLayoutRes, boolean usePalette, @Nullable CabHolder cabHolder) {
         super(activity, cabHolder, R.menu.menu_media_selection);
+        this.context = context;
         this.activity = activity;
         this.dataSet = dataSet;
         this.itemLayoutRes = itemLayoutRes;
@@ -129,7 +132,7 @@ public class AlbumAdapter extends AbsMultiSelectAdapter<AlbumAdapter.ViewHolder,
     protected void loadAlbumCover(Album album, final ViewHolder holder) {
         if (holder.image == null) return;
 
-        SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+        SongGlideRequest.Builder.from(context, Glide.with(activity), album.safeGetFirstSong())
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(new PhonographColoredTarget(holder.image) {

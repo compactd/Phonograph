@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -128,7 +129,7 @@ public class AlbumCoverPagerAdapter extends CustomFragmentStatePagerAdapter {
         }
 
         private void loadAlbumCover() {
-            SongGlideRequest.Builder.from(Glide.with(this), song)
+            SongGlideRequest.Builder.from(this.getContext(), Glide.with(this), song)
                     .checkIgnoreMediaStore(getActivity())
                     .generatePalette(getActivity()).build()
                     .into(new PhonographColoredTarget(albumCover) {

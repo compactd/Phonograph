@@ -1,5 +1,6 @@
 package com.kabouzeid.gramophone.adapter;
 
+import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
@@ -38,8 +39,10 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     private final AppCompatActivity activity;
     private List<Object> dataSet;
+    private final Context context;
 
-    public SearchAdapter(@NonNull AppCompatActivity activity, @NonNull List<Object> dataSet) {
+    public SearchAdapter(Context context, @NonNull List<Object> dataSet, @NonNull AppCompatActivity activity) {
+        this.context = context;
         this.activity = activity;
         this.dataSet = dataSet;
     }
@@ -73,7 +76,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 final Album album = (Album) dataSet.get(position);
                 holder.title.setText(album.getTitle());
                 holder.text.setText(album.getArtistName());
-                SongGlideRequest.Builder.from(Glide.with(activity), album.safeGetFirstSong())
+                SongGlideRequest.Builder.from(context, Glide.with(activity), album.safeGetFirstSong())
                         .checkIgnoreMediaStore(activity).build()
                         .into(holder.image);
                 break;

@@ -259,6 +259,7 @@ public class CardPlayerFragment extends AbsPlayerFragment implements PlayerAlbum
         final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
 
         playingQueueAdapter = new PlayingQueueAdapter(
+                this.getContext(),
                 ((AppCompatActivity) getActivity()),
                 MusicPlayerRemote.getPlayingQueue(),
                 MusicPlayerRemote.getPosition(),

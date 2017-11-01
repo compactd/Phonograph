@@ -577,9 +577,9 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
 
     public void initNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !PreferenceUtil.getInstance(this).classicNotification()) {
-            playingNotification = new PlayingNotificationImpl24();
+            playingNotification = new PlayingNotificationImpl24(this.getApplicationContext());
         } else {
-            playingNotification = new PlayingNotificationImpl();
+            playingNotification = new PlayingNotificationImpl(this.getApplicationContext());
         }
         playingNotification.init(this);
     }
@@ -623,7 +623,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
 
         if (PreferenceUtil.getInstance(this).albumArtOnLockscreen()) {
             final Point screenSize = Util.getScreenSize(MusicService.this);
-            final BitmapRequestBuilder<?, Bitmap> request = SongGlideRequest.Builder.from(Glide.with(MusicService.this), song)
+            final BitmapRequestBuilder<?, Bitmap> request = SongGlideRequest.Builder.from(getApplicationContext(), Glide.with(MusicService.this), song)
                     .checkIgnoreMediaStore(MusicService.this)
                     .asBitmap().build();
             if (PreferenceUtil.getInstance(this).blurredAlbumArt()) {
