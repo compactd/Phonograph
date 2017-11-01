@@ -123,9 +123,9 @@ public class CompactdSync {
         public void onDatabaseChanged ();
     }
 
-    private CompactdSync(Context context) throws IOException {
+    private CompactdSync(Context context) {
         this.mContext = context;
-        this.mManager = new Manager(new AndroidContext(context.getApplicationContext()), Manager.DEFAULT_OPTIONS);
+        this.mManager = CompactdManager.getInstance(context);
     }
 
     public void start () {
@@ -290,11 +290,7 @@ public class CompactdSync {
     }
     public static CompactdSync getInstance(Context context) {
         if (sInstance == null) {
-            try {
-                sInstance = new CompactdSync(context.getApplicationContext());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            sInstance = new CompactdSync(context.getApplicationContext());
         }
         return sInstance;
     }

@@ -26,7 +26,9 @@ import com.kabouzeid.gramophone.util.PreferenceUtil;
 
 import java.io.IOException;
 
+import io.compactd.compactd.CompactdManager;
 import io.compactd.compactd.models.CompactdAlbum;
+import io.compactd.compactd.models.CompactdModel;
 import io.compactd.compactd.models.CompactdTrack;
 
 /**
@@ -160,15 +162,10 @@ public class SongGlideRequest {
 
     public static DrawableTypeRequest createBaseRequest(Context context, RequestManager requestManager, Song song, boolean ignoreMediaStore) {
 
-        try {
-            return requestManager.load(new AudioFileCover(CompactdAlbum.findById(
-                    new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS),
-                    song.albumId
-            )));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return requestManager.load(new AudioFileCover(CompactdAlbum.findById(
+                CompactdManager.getInstance(context),
+                song.albumId
+        )));
     }
 
     public static Key createSignature(Song song) {

@@ -75,6 +75,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.compactd.compactd.CompactdManager;
 import io.compactd.compactd.CompactdRequest;
 import io.compactd.compactd.models.CompactdTrack;
 
@@ -510,7 +511,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
             try {
                 Song song = getCurrentSong();
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
-                Manager manager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
+                Manager manager = CompactdManager.getInstance(getApplicationContext());
                 URL url = new URL(preferenceUtil.lastServerURL());
                 CompactdRequest req = new CompactdRequest(url, "/api/boombox/direct");
                 req.setSessionToken(preferenceUtil.sessionToken());
@@ -541,7 +542,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
                 Song song = getSongAt(nextPosition);
                 if (song.id == -1) return false;
                 PreferenceUtil preferenceUtil = PreferenceUtil.getInstance(this);
-                Manager manager = new Manager(new AndroidContext(this), Manager.DEFAULT_OPTIONS);
+                Manager manager = CompactdManager.getInstance(getApplicationContext());
                 URL url = new URL(preferenceUtil.lastServerURL());
                 CompactdRequest req = new CompactdRequest(url, "/api/boombox/direct");
                 req.setSessionToken(preferenceUtil.sessionToken());

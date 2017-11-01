@@ -21,6 +21,7 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import io.compactd.compactd.CompactdManager;
 import io.compactd.compactd.models.CompactdTrack;
 
 /**
@@ -115,11 +116,8 @@ public class SongLoader {
         }
 
         try {
-            return CompactdTrack.makeCursor(new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS));
+            return CompactdTrack.makeCursor(CompactdManager.getInstance(context));
         } catch (SecurityException e) {
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.compactd.compactd.CompactdManager;
 import io.compactd.compactd.models.CompactdArtist;
 
 /**
@@ -35,7 +36,7 @@ public class ArtistLoader {
 
         ArrayList<Artist> artists = new ArrayList<>();
         try {
-            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS));
+            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context));
             artists.addAll(Collections2.transform(compactdArtists, new Function<CompactdArtist, Artist>() {
 
                 @javax.annotation.Nullable
@@ -47,8 +48,6 @@ public class ArtistLoader {
             }));
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         Log.d(TAG, "getAllArtists: took " + (System.currentTimeMillis() - ms) + "ms");
         return artists;
@@ -58,7 +57,7 @@ public class ArtistLoader {
     public static ArrayList<Artist> getArtists(@NonNull final Context context, final String query) {
         ArrayList<Artist> artists = new ArrayList<>();
         try {
-            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS));
+            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context));
             List<CompactdArtist> filteredArtists = new ArrayList<>(Collections2.filter(compactdArtists, new Predicate<CompactdArtist>() {
                 @Override
                 public boolean apply(@javax.annotation.Nullable CompactdArtist input) {
@@ -77,29 +76,21 @@ public class ArtistLoader {
             }));
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return artists;
     }
 
     @NonNull
     public static Artist getArtist(@NonNull final Context context, int artistId) {
-        long ms = System.currentTimeMillis();
-        try {
-            CompactdArtist artist =
-                    CompactdArtist.findById(
-                            new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS),
-                            artistId);
+        CompactdArtist artist =
+                CompactdArtist.findById(
+                        CompactdManager.getInstance(context),
+                        artistId);
 
-            if (artist != null) {
+        if (artist != null) {
 
-                Log.d(TAG, "getArtist: " + artistId + " in " + (System.currentTimeMillis() - ms) + "ms");
-                return artist.toArtist();
+            return artist.toArtist();
 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         throw new Error("not found");
     }
