@@ -330,7 +330,8 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             }
             ((TextView) navigationDrawerHeader.findViewById(R.id.title)).setText(song.title);
             ((TextView) navigationDrawerHeader.findViewById(R.id.text)).setText(song.artistName);
-            SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this), song)
+            SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this),
+                    song.getAlbum(this, true).toAlbum())
                     .checkIgnoreMediaStore(this).build()
                     .into(((ImageView) navigationDrawerHeader.findViewById(R.id.image)));
         } else {
@@ -411,7 +412,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
             final int id = (int) parseIdFromIntent(intent, "albumId", "album");
             if (id >= 0) {
                 int position = intent.getIntExtra("position", 0);
-                MusicPlayerRemote.openQueue(AlbumLoader.getAlbum(this, id).songs, position, true);
+                MusicPlayerRemote.openQueue(AlbumLoader.getAlbum(this, id).getSongs(), position, true);
                 handled = true;
             }
         } else if (MediaStore.Audio.Artists.CONTENT_TYPE.equals(mimeType)) {

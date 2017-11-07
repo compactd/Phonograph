@@ -4,27 +4,28 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.couchbase.lite.CouchbaseLiteException;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import io.compactd.compactd.models.CompactdArtist;
+import io.compactd.compactd.models.CompactdModel;
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class Artist implements Parcelable {
-    public final ArrayList<Album> albums;
+public class Artist {
+    public ArrayList<Album> albums;
     public CompactdArtist artist;
 
-    public Artist(ArrayList<Album> albums, CompactdArtist artist) {
-        this.albums = albums;
+    public Artist(CompactdArtist artist) {
         this.artist = artist;
     }
 
-    public Artist(ArrayList<Album> albums) {
-        this(albums, null);
-    }
     public Artist () {
-        this(new ArrayList<Album>());
+
     }
 
     public int getId() {
@@ -36,28 +37,24 @@ public class Artist implements Parcelable {
     }
 
     public int getSongCount() {
-        int songCount = 0;
-        for (Album album : albums) {
-            songCount += album.getSongCount();
-        }
-        return songCount;
+        return artist.getTrackCount();
     }
 
     public int getAlbumCount() {
-        return albums.size();
+        return artist.getAlbumCount();
     }
 
     public ArrayList<Song> getSongs() {
         ArrayList<Song> songs = new ArrayList<>();
-        for (Album album : albums) {
-            songs.addAll(album.songs);
+        try {
+            List<CompactdTrack> tracks = artist.getTracks(CompactdModel.FindMode.Prefetch);
+            for (CompactdTrack track : tracks) {
+                songs.add(track.toSong());
+            }
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
         }
         return songs;
-    }
-
-    @NonNull
-    public Album safeGetFirstAlbum() {
-        return albums.isEmpty() ? new Album() : albums.get(0);
     }
 
     @Override
@@ -79,34 +76,8 @@ public class Artist implements Parcelable {
     @Override
     public String toString() {
         return "Artist{" +
-                "albums=" + albums +
+                "name=" + artist.getName() +
                 '}';
     }
 
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(this.albums);
-    }
-
-    protected Artist(Parcel in) {
-        this.albums = in.createTypedArrayList(Album.CREATOR);
-    }
-
-    public static final Parcelable.Creator<Artist> CREATOR = new Parcelable.Creator<Artist>() {
-        @Override
-        public Artist createFromParcel(Parcel source) {
-            return new Artist(source);
-        }
-
-        @Override
-        public Artist[] newArray(int size) {
-            return new Artist[size];
-        }
-    };
 }

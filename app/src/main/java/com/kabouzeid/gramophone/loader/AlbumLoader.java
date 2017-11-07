@@ -42,7 +42,7 @@ public class AlbumLoader {
 
         ArrayList<Album> albums = new ArrayList<>();
         try {
-            List<CompactdAlbum> compactdAlbums = CompactdAlbum.findAll(CompactdManager.getInstance(context));
+            List<CompactdAlbum> compactdAlbums = CompactdAlbum.findAll(CompactdManager.getInstance(context), CompactdModel.FindMode.Prefetch);
             albums.addAll(Collections2.transform(compactdAlbums, new Function<CompactdAlbum, Album>() {
 
                 @javax.annotation.Nullable
@@ -63,7 +63,7 @@ public class AlbumLoader {
         Log.d(TAG, "getAlbums: " + query);
         ArrayList<Album> albums = new ArrayList<>();
         try {
-            List<CompactdAlbum> compactdAlbums = CompactdAlbum.findAll(CompactdManager.getInstance(context));
+            List<CompactdAlbum> compactdAlbums = CompactdAlbum.findAll(CompactdManager.getInstance(context), CompactdModel.FindMode.Prefetch);
             List<CompactdAlbum> filteredAlbums = new ArrayList<>(Collections2.filter(compactdAlbums, new Predicate<CompactdAlbum>() {
                 @Override
                 public boolean apply(@javax.annotation.Nullable CompactdAlbum input) {
@@ -91,20 +91,9 @@ public class AlbumLoader {
         CompactdAlbum album =
                 CompactdAlbum.findById(
                         CompactdManager.getInstance(context),
-                        albumId);
+                        albumId, true);
 
         if (album != null) return album.toAlbum();
         throw new Error("not found");
-    }
-
-    private static Album getOrCreateAlbum(ArrayList<Album> albums, int albumId) {
-        for (Album album : albums) {
-            if (!album.songs.isEmpty() && album.songs.get(0).albumId == albumId) {
-                return album;
-            }
-        }
-        Album album = new Album();
-        albums.add(album);
-        return album;
     }
 }

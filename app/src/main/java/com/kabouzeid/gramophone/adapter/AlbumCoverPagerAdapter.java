@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.couchbase.lite.Manager;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.glide.PhonographColoredTarget;
 import com.kabouzeid.gramophone.glide.SongGlideRequest;
@@ -23,6 +24,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.compactd.compactd.CompactdManager;
+import io.compactd.compactd.models.CompactdAlbum;
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -91,7 +95,8 @@ public class AlbumCoverPagerAdapter extends CustomFragmentStatePagerAdapter {
         public static AlbumCoverFragment newInstance(final Song song) {
             AlbumCoverFragment frag = new AlbumCoverFragment();
             final Bundle args = new Bundle();
-            args.putParcelable(SONG_ARG, song);
+            args.putInt(SONG_ARG, song.id);
+            //  args.putParcelable(SONG_ARG, song);
             frag.setArguments(args);
             return frag;
         }
@@ -99,7 +104,9 @@ public class AlbumCoverPagerAdapter extends CustomFragmentStatePagerAdapter {
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            song = getArguments().getParcelable(SONG_ARG);
+            Manager manager = CompactdManager.getInstance(this.getContext());
+            song = CompactdTrack.findById(manager, this.getArguments().getInt(SONG_ARG),
+                    true).toSong();
         }
 
         @Override
@@ -129,7 +136,9 @@ public class AlbumCoverPagerAdapter extends CustomFragmentStatePagerAdapter {
         }
 
         private void loadAlbumCover() {
-            SongGlideRequest.Builder.from(this.getContext(), Glide.with(this), song)
+            Manager instance = CompactdManager.getInstance(getContext());
+            SongGlideRequest.Builder.from(getContext(), Glide.with(this),
+                    CompactdAlbum.findById(instance, song.albumId, true).toAlbum())
                     .checkIgnoreMediaStore(getActivity())
                     .generatePalette(getActivity()).build()
                     .into(new PhonographColoredTarget(albumCover) {

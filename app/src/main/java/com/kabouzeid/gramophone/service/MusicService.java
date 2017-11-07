@@ -518,7 +518,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
                 JSONObject data = new JSONObject();
                 Log.d(TAG, "openCurrent: "+song.id);
 
-                data.put("track", CompactdTrack.findById(manager, song.id).getId());
+                data.put("track", CompactdTrack.findById(manager, song.id, false).getId());
                 JSONObject res = req.post(data);
                 String token = res.getString("token");
 
@@ -549,7 +549,7 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
                 JSONObject data = new JSONObject();
                 Log.d(TAG, "prepareNextImpl: "+song.id);
 
-                data.put("track", CompactdTrack.findById(manager, song.id).getId());
+                data.put("track", CompactdTrack.findById(manager, song.id, false).getId());
                 JSONObject res = req.post(data);
                 String token = res.getString("token");
 
@@ -624,7 +624,9 @@ public class MusicService extends Service implements SharedPreferences.OnSharedP
 
         if (PreferenceUtil.getInstance(this).albumArtOnLockscreen()) {
             final Point screenSize = Util.getScreenSize(MusicService.this);
-            final BitmapRequestBuilder<?, Bitmap> request = SongGlideRequest.Builder.from(getApplicationContext(), Glide.with(MusicService.this), song)
+            final BitmapRequestBuilder<?, Bitmap> request = SongGlideRequest.Builder.from(getApplicationContext(),
+                    Glide.with(MusicService.this),
+                    song.getAlbum(this, true).toAlbum())
                     .checkIgnoreMediaStore(MusicService.this)
                     .asBitmap().build();
             if (PreferenceUtil.getInstance(this).blurredAlbumArt()) {

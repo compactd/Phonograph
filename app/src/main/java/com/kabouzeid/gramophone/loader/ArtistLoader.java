@@ -23,6 +23,7 @@ import java.util.List;
 
 import io.compactd.compactd.CompactdManager;
 import io.compactd.compactd.models.CompactdArtist;
+import io.compactd.compactd.models.CompactdModel;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -36,7 +37,7 @@ public class ArtistLoader {
 
         ArrayList<Artist> artists = new ArrayList<>();
         try {
-            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context));
+            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context), CompactdModel.FindMode.Prefetch);
             artists.addAll(Collections2.transform(compactdArtists, new Function<CompactdArtist, Artist>() {
 
                 @javax.annotation.Nullable
@@ -57,7 +58,7 @@ public class ArtistLoader {
     public static ArrayList<Artist> getArtists(@NonNull final Context context, final String query) {
         ArrayList<Artist> artists = new ArrayList<>();
         try {
-            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context));
+            List<CompactdArtist> compactdArtists = CompactdArtist.findAll(CompactdManager.getInstance(context), CompactdModel.FindMode.Prefetch);
             List<CompactdArtist> filteredArtists = new ArrayList<>(Collections2.filter(compactdArtists, new Predicate<CompactdArtist>() {
                 @Override
                 public boolean apply(@javax.annotation.Nullable CompactdArtist input) {
@@ -85,7 +86,7 @@ public class ArtistLoader {
         CompactdArtist artist =
                 CompactdArtist.findById(
                         CompactdManager.getInstance(context),
-                        artistId);
+                        artistId, true);
 
         if (artist != null) {
 

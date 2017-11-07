@@ -101,7 +101,8 @@ public class AppWidgetCard extends BaseAppWidget {
                 if (target != null) {
                     Glide.clear(target);
                 }
-                target = SongGlideRequest.Builder.from(context, Glide.with(service), song)
+                target = SongGlideRequest.Builder.from(context, Glide.with(service),
+                        song.getAlbum(context, true).toAlbum())
                         .checkIgnoreMediaStore(service)
                         .generatePalette(service).build()
                         .centerCrop()

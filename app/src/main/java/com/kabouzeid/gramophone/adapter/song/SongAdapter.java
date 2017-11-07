@@ -136,7 +136,8 @@ public class SongAdapter extends AbsMultiSelectAdapter<SongAdapter.ViewHolder, S
     protected void loadAlbumCover(Song song, final ViewHolder holder) {
         if (holder.image == null) return;
 
-        SongGlideRequest.Builder.from(context, Glide.with(activity), song)
+        SongGlideRequest.Builder.from(context, Glide.with(activity),
+                song.getAlbum(context, true).toAlbum())
                 .checkIgnoreMediaStore(activity)
                 .generatePalette(activity).build()
                 .into(new PhonographColoredTarget(holder.image) {

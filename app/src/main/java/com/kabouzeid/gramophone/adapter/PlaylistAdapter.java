@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
+import com.couchbase.lite.Manager;
 import com.kabouzeid.appthemehelper.util.ATHUtil;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.adapter.base.AbsMultiSelectAdapter;
@@ -24,6 +25,7 @@ import com.kabouzeid.gramophone.interfaces.CabHolder;
 import com.kabouzeid.gramophone.loader.PlaylistSongLoader;
 import com.kabouzeid.gramophone.model.AbsCustomPlaylist;
 import com.kabouzeid.gramophone.model.Playlist;
+import com.kabouzeid.gramophone.model.PlaylistSong;
 import com.kabouzeid.gramophone.model.Song;
 import com.kabouzeid.gramophone.model.smartplaylist.AbsSmartPlaylist;
 import com.kabouzeid.gramophone.model.smartplaylist.LastAddedPlaylist;
@@ -32,6 +34,9 @@ import com.kabouzeid.gramophone.util.NavigationUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.compactd.compactd.CompactdManager;
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -162,7 +167,11 @@ public class PlaylistAdapter extends AbsMultiSelectAdapter<PlaylistAdapter.ViewH
             if (playlist instanceof AbsCustomPlaylist) {
                 songs.addAll(((AbsCustomPlaylist) playlist).getSongs(activity));
             } else {
-                songs.addAll(PlaylistSongLoader.getPlaylistSongList(activity, playlist.id));
+                ArrayList<PlaylistSong> playlistSongList = PlaylistSongLoader.getPlaylistSongList(activity, playlist.id);
+                for (PlaylistSong song : playlistSongList) {
+                    Manager manager = CompactdManager.getInstance(activity.getApplicationContext());
+                    songs.add(CompactdTrack.findById(manager, song.id, true).toSong());
+                }
             }
         }
         return songs;

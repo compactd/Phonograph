@@ -168,7 +168,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
     }
 
     private void loadAlbumCover() {
-        SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this), getAlbum().safeGetFirstSong())
+        SongGlideRequest.Builder.from(this.getApplicationContext(), Glide.with(this), getAlbum())
                 .checkIgnoreMediaStore(this)
                 .generatePalette(this).build()
                 .dontAnimate()
@@ -235,7 +235,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
     }
 
     private void setUpSongsAdapter() {
-        adapter = new AlbumSongAdapter(this, this, getAlbum().songs, R.layout.item_list, false, this);
+        adapter = new AlbumSongAdapter(this, this, getAlbum().getSongs(), R.layout.item_list, false, this);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setAdapter(adapter);
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -428,7 +428,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
         }
 
         albumTitleView.setText(album.getTitle());
-        adapter.swapDataSet(album.songs);
+        adapter.swapDataSet(album.getSongs());
     }
 
     private Album getAlbum() {
@@ -450,7 +450,7 @@ public class AlbumDetailActivity extends AbsSlidingMusicPanelActivity implements
     @Override
     public void onLoaderReset(Loader<Album> loader) {
         this.album = new Album();
-        adapter.swapDataSet(album.songs);
+        adapter.swapDataSet(album.getSongs());
     }
 
     private static class AsyncAlbumLoader extends WrappedAsyncTaskLoader<Album> {

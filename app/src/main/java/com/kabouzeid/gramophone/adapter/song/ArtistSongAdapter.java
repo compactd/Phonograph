@@ -85,7 +85,8 @@ public class ArtistSongAdapter extends ArrayAdapter<Song> implements MaterialCab
         songTitle.setText(song.title);
         songInfo.setText(song.albumName);
 
-        SongGlideRequest.Builder.from(getContext(), Glide.with(activity), song)
+        SongGlideRequest.Builder.from(getContext(), Glide.with(activity),
+                song.getAlbum(getContext(), true).toAlbum())
                 .checkIgnoreMediaStore(activity).build()
                 .into(albumArt);
 

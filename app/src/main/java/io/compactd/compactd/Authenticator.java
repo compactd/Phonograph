@@ -40,14 +40,10 @@ public class Authenticator {
     }
 
     public boolean isTokenValid (String token) {
-        Log.d(TAG, "isTokenValid: " + token);
         try {
             JSONObject decoded = decode(token);
-            if (decoded == null) return false;
-            Log.d(TAG, "isTokenValid: " + decoded.toString());
-            Log.d(TAG, "isTokenValid: checking exp against "+ (System.currentTimeMillis() + 1000 * 60 * 60) / 1000L);
-            return (System.currentTimeMillis() + 1000 * 60 * 60) / 1000L <=
-                    decoded.getInt("exp");
+            return decoded != null && (System.currentTimeMillis() + 1000 * 60 * 60)
+                    / 1000L <= decoded.getInt("exp");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;

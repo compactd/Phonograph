@@ -2,8 +2,6 @@ package io.compactd.compactd;
 
 import android.util.Log;
 
-import com.readystatesoftware.chuck.ChuckInterceptor;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,9 +45,8 @@ public class CompactdRequest {
         return mSessionToken;
     }
 
-    public CompactdRequest setSessionToken(String sessionToken) {
+    public void setSessionToken(String sessionToken) {
         this.mSessionToken = sessionToken;
-        return this;
     }
     public JSONObject post (JSONObject data) throws IOException, JSONException, CompactdException {
         ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)

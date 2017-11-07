@@ -1,6 +1,7 @@
 package io.compactd.compactd.models;
 
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
@@ -11,7 +12,6 @@ import com.couchbase.lite.QueryEnumerator;
 import com.couchbase.lite.QueryRow;
 import com.kabouzeid.gramophone.model.Album;
 import com.kabouzeid.gramophone.model.Artist;
-import com.kabouzeid.gramophone.model.Song;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,41 +28,51 @@ import javax.annotation.Nullable;
 public class CompactdArtist extends CompactdModel {
     public static final String DATABASE_NAME = "artists";
     private static final String TAG = "CompactdArtist";
-    private String name;
+
+    private static SparseArray<CompactdArtist> cache = new SparseArray<>();
+
+    private String mName;
 
     public CompactdArtist(Manager manager, String id) {
         super(manager, id);
     }
 
+    CompactdArtist(CompactdArtist artist) {
+        super(artist);
+        mName = artist.getName();
+    }
+
     @Override
     public void fromMap(Map<String, Object> map) {
-        this.setName((String) map.get("name"));
+        mName = (String) map.get("name");
+        mState = ModelState.Prefetched;
     }
 
     @Override
     public void fetch() throws CouchbaseLiteException {
+        if (getState() == ModelState.Fetched) return;
         Database db = this.mManager.getDatabase(DATABASE_NAME);
         Document doc = db.getDocument(mId);
         fromMap(doc.getProperties());
+        mState = ModelState.Fetched;
     }
 
     public String getName() {
-        return name;
+        return mName;
     }
 
-    private void setName(String name) {
-        this.name = name;
-    }
 
     public List<CompactdAlbum> getAlbums () throws CouchbaseLiteException {
-        return getAlbums(true);
+        return getAlbums(FindMode.Prefetch);
     }
-    public List<CompactdAlbum> getAlbums (boolean fetch) throws CouchbaseLiteException {
-        return CompactdAlbum.findAll(mManager, getId(), fetch);
+
+    public List<CompactdAlbum> getAlbums (FindMode mode) throws CouchbaseLiteException {
+        return CompactdAlbum.findAll(mManager, getId(), mode);
     }
+
     public int getAlbumCount () {
         try {
-            return getAlbums(false).size();
+            return getAlbums(FindMode.OnlyIds).size();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return 0;
@@ -70,29 +80,28 @@ public class CompactdArtist extends CompactdModel {
     }
     public int getTrackCount () {
         try {
-            return CompactdAlbum.findAll(mManager, getId(), false).size();
+            return CompactdTrack.findAll(mManager, getId(), FindMode.OnlyIds).size();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return 0;
         }
     }
-    public List<CompactdAlbum> getTracks () throws CouchbaseLiteException {
-        return CompactdAlbum.findAll(mManager, getId(), true);
+    public List<CompactdTrack> getTracks (FindMode mode) throws CouchbaseLiteException {
+        return CompactdTrack.findAll(mManager, getId(), mode);
     }
     @Override
     public Map<String, String> getURIProps () {
         Map<String, String> props = new HashMap<>();
         String[] splat = getId().split("/");
-        props.put("name", splat[1]);
+        props.put("mName", splat[1]);
         return props;
     }
 
     public String getImagePath (int size) {
         if (size <= 0) {
-            Log.d(TAG, "getImagePath: size is less than 0, setting to 300");
             size = 300;
         }
-        String uriName = getURIProps().get("name");
+        String uriName = getURIProps().get("mName");
         return "/api/aquarelle/" + uriName + "?s=" + size;
     }
 
@@ -105,41 +114,43 @@ public class CompactdArtist extends CompactdModel {
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
-        return new Artist(albums, this);
+        return new Artist(this);
     }
 
     public String getArtworkURI (URL base, int size) {
         String url = base.toString();
 
-        url = url + "/api/aquarelle/" + getURIProps().get("name") + "?s=" + size;
+        url = url + "/api/aquarelle/" + getURIProps().get("mName") + "?s=" + size;
 
         return url;
     }
 
-    public static List<CompactdArtist> findAll (Manager manager) throws CouchbaseLiteException {
-        return findAll(manager, "library/", true);
-    }
-    public static List<CompactdArtist> findAll (Manager manager, boolean fetch) throws CouchbaseLiteException {
-        return findAll(manager, "library/", fetch);
+    public static List<CompactdArtist> findAll (Manager manager, FindMode mode) throws CouchbaseLiteException {
+        return findAll(manager, "library/", mode);
     }
 
-    public static List<CompactdArtist> findAll (Manager manager, String key, boolean fetch) throws CouchbaseLiteException {
+    public static List<CompactdArtist> findAll (Manager manager, String key, FindMode mode) throws CouchbaseLiteException {
         Database db = manager.getDatabase(DATABASE_NAME);
         Query query = db.createAllDocumentsQuery();
         query.setStartKey(key);
-        query.setEndKey(key + "\uffff");
+        query.setEndKey(key + LAST_CHARACTER);
         query.setAllDocsMode(Query.AllDocsMode.ALL_DOCS);
+        query.setPrefetch(mode == FindMode.Prefetch);
+
         List<CompactdArtist> artists = new ArrayList<>();
+
         QueryEnumerator result = query.run();
+
         while (result.hasNext()) {
             QueryRow row = result.next();
             CompactdArtist artist = new CompactdArtist(manager, row.getDocumentId());
 
-            if (fetch) {
+            if (mode == FindMode.Fetch) {
                 artist.fetch();
-            } else {
+            } else if (mode == FindMode.Prefetch) {
                 artist.fromMap(row.getDocumentProperties());
             }
+
             artists.add(artist);
         }
         return artists;
@@ -147,9 +158,22 @@ public class CompactdArtist extends CompactdModel {
 
     @Nullable
     public static CompactdArtist findById (Manager manager, int id, boolean fetch)  {
+        CompactdArtist cached = cache.get(id);
+        if (cached != null) {
+            if (fetch && cached.getState() != ModelState.Fetched) {
+                try {
+                    cached.fetch();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+            }
+            return new CompactdArtist(cached);
+        }
+        
         List<CompactdArtist> artists = null;
+        
         try {
-            artists = findAll(manager, fetch);
+            artists = findAll(manager, FindMode.OnlyIds);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return null;
@@ -164,15 +188,11 @@ public class CompactdArtist extends CompactdModel {
                         return null;
                     }
                 }
+                cache.append(id, new CompactdArtist(artist));
                 return artist;
             }
         }
         return null;
-    }
-
-    @Nullable
-    public static CompactdArtist findById (Manager manager, int id) {
-        return findById(manager, id, true);
     }
 
     @Nullable
@@ -191,8 +211,4 @@ public class CompactdArtist extends CompactdModel {
         }
     }
 
-    @Nullable
-    public static CompactdArtist findById (Manager manager, String id)  {
-        return findById(manager, id, true);
-    }
 }

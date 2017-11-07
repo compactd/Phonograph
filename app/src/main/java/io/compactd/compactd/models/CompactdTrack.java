@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
@@ -36,16 +37,44 @@ public class CompactdTrack extends CompactdModel {
     private double mDuration;
     private int mNumber;
 
+    private static SparseArray<CompactdTrack> cache = new SparseArray<>();
+
     public CompactdTrack(Manager manager, String id) {
         super(manager, id);
     }
 
+    public CompactdTrack(CompactdTrack other) {
+        super(other);
+        mName = other.getName();
+        mHidden = other.isHidden();
+        mArtist = new CompactdArtist(other.getArtist());
+        mAlbum = new CompactdAlbum(other.getAlbum());
+        mDuration = other.getDuration();
+        mNumber = other.getNumber();
+    }
+
     @Override
     public void fromMap(Map<String, Object> map) {
+        super.fromMap(map);
         mName     = (String) map.get("name");
         mHidden   = map.containsKey("hidden") && (boolean) map.get("hidden");
-        mArtist   = (CompactdArtist) map.get("artist");
-        mAlbum    = (CompactdAlbum) map.get("album");
+
+        Object artist = map.get("artist");
+
+        if (artist instanceof CompactdArtist) {
+            mArtist = (CompactdArtist) artist;
+        } else {
+            mArtist = new CompactdArtist(mManager, (String) artist);
+        }
+
+        Object album = map.get("album");
+
+        if (album instanceof CompactdAlbum) {
+            mAlbum = (CompactdAlbum) album;
+        } else {
+            mAlbum    = new CompactdAlbum(mManager, (String) album);
+        }
+
         mDuration = getMillisDurationFromSeconds(map.get("duration"));
         mNumber   = (Integer) map.get("number");
     }
@@ -77,6 +106,8 @@ public class CompactdTrack extends CompactdModel {
 
     @Override
     public void fetch() throws CouchbaseLiteException {
+        if (getState() == ModelState.Fetched) return;
+
         Database db = this.mManager.getDatabase(DATABASE_NAME);
         Document doc = db.getDocument(mId);
 
@@ -94,6 +125,8 @@ public class CompactdTrack extends CompactdModel {
         props.put("album", album);
 
         fromMap(props);
+
+        mState = ModelState.Fetched;
     }
 
     @Override
@@ -136,27 +169,26 @@ public class CompactdTrack extends CompactdModel {
         return mNumber;
     }
 
-    public static List<CompactdTrack> findAll (Manager manager, boolean fetch) throws CouchbaseLiteException {
-        return findAll(manager, "library/", fetch);
+    public static List<CompactdTrack> findAll (Manager manager, FindMode mode) throws CouchbaseLiteException {
+        return findAll(manager, "library/", mode);
     }
-    public static List<CompactdTrack> findAll (Manager manager) throws CouchbaseLiteException {
-        return findAll(manager, true);
-    }
-    public static List<CompactdTrack> findAll (Manager manager, String key, boolean fetch) throws CouchbaseLiteException {
+
+    public static List<CompactdTrack> findAll (Manager manager, String key, FindMode mode) throws CouchbaseLiteException {
         Database db = manager.getDatabase(DATABASE_NAME);
         Query query = db.createAllDocumentsQuery();
         query.setStartKey(key);
         query.setEndKey(key + "\uffff");
         query.setAllDocsMode(Query.AllDocsMode.ALL_DOCS);
+        query.setPrefetch(mode == FindMode.Prefetch);
 
         List<CompactdTrack> tracks = new ArrayList<>();
         QueryEnumerator result = query.run();
         while (result.hasNext()) {
             QueryRow row = result.next();
             CompactdTrack album = new CompactdTrack(manager, row.getDocumentId());
-            if (fetch) {
+            if (mode == FindMode.Fetch) {
                 album.fetch();
-            } else {
+            } else if (mode == FindMode.Prefetch){
                 album.fromMap(row.getDocumentProperties());
             }
             tracks.add(album);
@@ -166,13 +198,28 @@ public class CompactdTrack extends CompactdModel {
 
     @Nullable
     public static CompactdTrack findById (Manager manager, int id, boolean fetch) {
+
+        CompactdTrack cached = cache.get(id);
+        if (cached != null) {
+            if (fetch) {
+                try {
+                    cached.fetch();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+            }
+            return new CompactdTrack(cached);
+        }
+
         List<CompactdTrack> tracks = null;
+
         try {
-            tracks = findAll(manager, fetch);
+            tracks = findAll(manager, FindMode.OnlyIds);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
             return null;
         }
+
         for (CompactdTrack track : tracks) {
             if (track.getId().hashCode() == id) {
                 if (fetch) {
@@ -183,15 +230,11 @@ public class CompactdTrack extends CompactdModel {
                         return null;
                     }
                 }
+                cache.put(id, new CompactdTrack(track));
                 return track;
             }
         }
         return null;
-    }
-
-    @Nullable
-    public static CompactdTrack findById (Manager manager, int id) {
-        return findById(manager, id, true);
     }
 
     @Nullable
@@ -232,7 +275,7 @@ public class CompactdTrack extends CompactdModel {
         MatrixCursor cursor = new MatrixCursor(columns);
 
         try {
-            for (CompactdTrack track : findAll(manager, true)) {
+            for (CompactdTrack track : findAll(manager, FindMode.Prefetch)) {
                 cursor.addRow(new Object[] {
                     track.getId().hashCode(),
                     track.getName(),

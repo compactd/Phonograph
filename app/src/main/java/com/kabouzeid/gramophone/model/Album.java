@@ -1,65 +1,64 @@
 package com.kabouzeid.gramophone.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import com.couchbase.lite.CouchbaseLiteException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.compactd.compactd.models.CompactdAlbum;
+import io.compactd.compactd.models.CompactdModel;
+import io.compactd.compactd.models.CompactdTrack;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class Album implements Parcelable {
-    public final ArrayList<Song> songs;
+public class Album {
     public CompactdAlbum album;
 
-    public Album(ArrayList<Song> songs, CompactdAlbum album) {
-        this.songs = songs;
+    public Album(CompactdAlbum album) {
         this.album = album;
-    }
-    public Album(ArrayList<Song> songs) {
-        this(songs, null);
     }
 
     public Album() {
-        this.songs = new ArrayList<>();
     }
 
     public int getId() {
-        return safeGetFirstSong().albumId;
+        return album.getId().hashCode();
     }
 
     public String getTitle() {
-        return safeGetFirstSong().albumName;
+        return album.getName();
     }
 
     public int getArtistId() {
-        return safeGetFirstSong().artistId;
+        return album.getArtist().getId().hashCode();
     }
 
     public String getArtistName() {
-        return safeGetFirstSong().artistName;
+        return album.getArtist().getName();
     }
 
     public int getYear() {
-        return safeGetFirstSong().year;
-    }
-
-    public long getDateModified() {
-        return safeGetFirstSong().dateModified;
+        return -1;
     }
 
     public int getSongCount() {
-        return songs.size();
+        return album.getTrackCount();
     }
 
-    @NonNull
-    public Song safeGetFirstSong() {
-        return songs.isEmpty() ? Song.EMPTY_SONG : songs.get(0);
-    }
+    public ArrayList<Song> getSongs() {
+        ArrayList<Song> songs = new ArrayList<>();
 
+        try {
+            List<CompactdTrack> tracks = album.getTracks(CompactdModel.FindMode.Prefetch);
+            for (CompactdTrack track : tracks) {
+                songs.add(track.toSong());
+            }
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+        return songs;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,43 +66,23 @@ public class Album implements Parcelable {
 
         Album that = (Album) o;
 
-        return songs != null ? songs.equals(that.songs) : that.songs == null;
+        return that.getId() == this.getId();
 
     }
 
     @Override
     public int hashCode() {
-        return songs != null ? songs.hashCode() : 0;
+        return 12 * album.hashCode() + 420;
     }
 
     @Override
     public String toString() {
         return "Album{" +
-                "songs=" + songs +
+                "album=" + album.toString() +
                 '}';
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public long getDateModified() {
+        return -1;
     }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(songs);
-    }
-
-    protected Album(Parcel in) {
-        this.songs = in.createTypedArrayList(Song.CREATOR);
-    }
-
-    public static final Creator<Album> CREATOR = new Creator<Album>() {
-        public Album createFromParcel(Parcel source) {
-            return new Album(source);
-        }
-
-        public Album[] newArray(int size) {
-            return new Album[size];
-        }
-    };
 }
