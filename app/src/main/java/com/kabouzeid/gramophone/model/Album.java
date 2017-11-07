@@ -28,18 +28,33 @@ public class Album {
     }
 
     public int getId() {
+
+        if (album == null) {
+            return 0;
+        }
         return album.getId().hashCode();
     }
 
     public String getTitle() {
+
+        if (album == null) {
+            return "Undefined";
+        }
         return album.getName();
     }
 
     public int getArtistId() {
+        if (album == null) {
+            return 0;
+        }
         return album.getArtist().getId().hashCode();
     }
 
     public String getArtistName() {
+
+        if (album == null) {
+            return "Undefined";
+        }
         CompactdArtist artist = album.getArtist();
         try {
             artist.fetch();
@@ -58,12 +73,17 @@ public class Album {
     }
 
     public int getSongCount() {
+        if (album == null) {
+            return 0;
+        }
         return album.getTrackCount();
     }
 
     public ArrayList<Song> getSongs() {
         ArrayList<Song> songs = new ArrayList<>();
-
+        if (album == null) {
+            return songs;
+        }
         try {
             List<CompactdTrack> tracks = album.getTracks(CompactdModel.FindMode.Prefetch);
             for (CompactdTrack track : tracks) {
@@ -93,7 +113,7 @@ public class Album {
     @Override
     public String toString() {
         return "Album{" +
-                "album=" + album.toString() +
+                "album=" + album +
                 '}';
     }
 

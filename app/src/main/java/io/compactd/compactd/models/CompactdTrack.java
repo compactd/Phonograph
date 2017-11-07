@@ -275,7 +275,7 @@ public class CompactdTrack extends CompactdModel {
         MatrixCursor cursor = new MatrixCursor(columns);
 
         try {
-            for (CompactdTrack track : findAll(manager, FindMode.Prefetch)) {
+            for (CompactdTrack track : findAll(manager, FindMode.Fetch)) {
                 cursor.addRow(new Object[] {
                     track.getId().hashCode(),
                     track.getName(),

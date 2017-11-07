@@ -200,7 +200,7 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
 
     private void setUpAlbumRecyclerView() {
         albumRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        albumAdapter = new HorizontalAlbumAdapter(this.getApplicationContext(), this, getArtist().albums, usePalette, this);
+        albumAdapter = new HorizontalAlbumAdapter(this.getApplicationContext(), this, getArtist().getAlbums(), usePalette, this);
         albumRecyclerView.setAdapter(albumAdapter);
         albumAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -343,6 +343,8 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
             case R.id.action_add_to_current_playing:
                 MusicPlayerRemote.enqueue(songs);
                 return true;
+            case R.id.action_add_to_playlist:
+                return true;
             case android.R.id.home:
                 super.onBackPressed();
                 return true;
@@ -443,7 +445,7 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
 
         artistName.setText(artist.getName());
         songAdapter.swapDataSet(artist.getSongs());
-        albumAdapter.swapDataSet(artist.albums);
+        albumAdapter.swapDataSet(artist.getAlbums());
     }
 
     private Artist getArtist() {
@@ -466,7 +468,7 @@ public class ArtistDetailActivity extends AbsSlidingMusicPanelActivity implement
     public void onLoaderReset(Loader<Artist> loader) {
         this.artist = new Artist();
         songAdapter.swapDataSet(artist.getSongs());
-        albumAdapter.swapDataSet(artist.albums);
+        albumAdapter.swapDataSet(artist.getAlbums());
     }
 
     private static class AsyncArtistDataLoader extends WrappedAsyncTaskLoader<Artist> {

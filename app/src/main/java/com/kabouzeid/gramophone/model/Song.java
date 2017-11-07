@@ -103,7 +103,7 @@ public class Song {
     }
 
     public CompactdAlbum getAlbum (Context context, boolean fetch) {
-        Log.d("Song", "getAlbum: " + this);
+
         Manager manager = CompactdManager.getInstance(context);
         return CompactdAlbum.findById(manager, albumId, fetch);
     }
