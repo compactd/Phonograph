@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.ui.fragments.mainactivity.library.pager.AlbumsFragment;
 import com.kabouzeid.gramophone.ui.fragments.mainactivity.library.pager.ArtistsFragment;
-import com.kabouzeid.gramophone.ui.fragments.mainactivity.library.pager.PlaylistsFragment;
 import com.kabouzeid.gramophone.ui.fragments.mainactivity.library.pager.SongsFragment;
 
 import java.lang.ref.WeakReference;
@@ -38,8 +37,7 @@ public class MusicLibraryPagerAdapter extends FragmentPagerAdapter {
         titles = new String[]{
                 context.getResources().getString(R.string.songs),
                 context.getResources().getString(R.string.albums),
-                context.getResources().getString(R.string.artists),
-                context.getResources().getString(R.string.playlists)
+                context.getResources().getString(R.string.artists)
         };
         final MusicFragments[] fragments = MusicFragments.values();
         for (final MusicLibraryPagerAdapter.MusicFragments fragment : fragments) {
@@ -109,8 +107,7 @@ public class MusicLibraryPagerAdapter extends FragmentPagerAdapter {
     public enum MusicFragments {
         SONG(SongsFragment.class),
         ALBUM(AlbumsFragment.class),
-        ARTIST(ArtistsFragment.class),
-        PLAYLIST(PlaylistsFragment.class);
+        ARTIST(ArtistsFragment.class);
 
         private final Class<? extends Fragment> mFragmentClass;
 

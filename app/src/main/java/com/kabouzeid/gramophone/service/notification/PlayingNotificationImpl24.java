@@ -63,7 +63,8 @@ public class PlayingNotificationImpl24 extends PlayingNotification {
         service.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                SongGlideRequest.Builder.from(context, Glide.with(service), song)
+                SongGlideRequest.Builder.from(context, Glide.with(service),
+                        song.getAlbum(context, true).toAlbum())
                         .checkIgnoreMediaStore(service)
                         .generatePalette(service).build()
                         .into(new SimpleTarget<BitmapPaletteWrapper>(bigNotificationImageSize, bigNotificationImageSize) {

@@ -1,11 +1,16 @@
 package com.kabouzeid.gramophone.model;
 
+import android.content.Context;
+
 import com.couchbase.lite.CouchbaseLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.compactd.compactd.models.CompactdAlbum;
+import io.compactd.compactd.models.CompactdArtist;
 import io.compactd.compactd.models.CompactdModel;
 import io.compactd.compactd.models.CompactdTrack;
 
@@ -35,7 +40,17 @@ public class Album {
     }
 
     public String getArtistName() {
-        return album.getArtist().getName();
+        CompactdArtist artist = album.getArtist();
+        try {
+            artist.fetch();
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+        return artist.getName();
+    }
+
+    public CompactdArtist getArtist () {
+        return album.getArtist();
     }
 
     public int getYear() {

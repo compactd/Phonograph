@@ -10,6 +10,7 @@ import android.view.View;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.model.Song;
+import com.kabouzeid.gramophone.model.SongWrapper;
 import com.kabouzeid.gramophone.util.MusicUtil;
 
 /**
@@ -20,7 +21,7 @@ public class SongShareDialog extends DialogFragment {
     public static SongShareDialog create(final Song song) {
         final SongShareDialog dialog = new SongShareDialog();
         final Bundle args = new Bundle();
-        args.putParcelable("song", song);
+        args.putParcelable("song", new SongWrapper(song));
         dialog.setArguments(args);
         return dialog;
     }
@@ -28,7 +29,7 @@ public class SongShareDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Song song = getArguments().getParcelable("song");
+        final Song song = ((SongWrapper) getArguments().getParcelable("song")).get(this.getContext());
         final String currentlyListening = getString(R.string.currently_listening_to_x_by_x, song.title, song.artistName);
         return new MaterialDialog.Builder(getActivity())
                 .title(R.string.what_do_you_want_to_share)

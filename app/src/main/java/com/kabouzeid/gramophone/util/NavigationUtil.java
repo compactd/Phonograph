@@ -15,7 +15,6 @@ import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
 import com.kabouzeid.gramophone.model.Playlist;
 import com.kabouzeid.gramophone.ui.activities.AlbumDetailActivity;
 import com.kabouzeid.gramophone.ui.activities.ArtistDetailActivity;
-import com.kabouzeid.gramophone.ui.activities.PlaylistDetailActivity;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)
@@ -36,13 +35,6 @@ public class NavigationUtil {
 
         //noinspection unchecked
         activity.startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(activity, sharedElements).toBundle());
-    }
-
-    public static void goToPlaylist(@NonNull final Activity activity, final Playlist playlist, @Nullable Pair... sharedElements) {
-        final Intent intent = new Intent(activity, PlaylistDetailActivity.class);
-        intent.putExtra(PlaylistDetailActivity.EXTRA_PLAYLIST, playlist);
-
-        activity.startActivity(intent);
     }
 
     public static void openEqualizer(@NonNull final Activity activity) {

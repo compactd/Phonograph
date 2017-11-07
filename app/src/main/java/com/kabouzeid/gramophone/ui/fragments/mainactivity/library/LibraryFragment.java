@@ -26,7 +26,6 @@ import com.kabouzeid.appthemehelper.util.TabLayoutUtil;
 import com.kabouzeid.appthemehelper.util.ToolbarContentTintHelper;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.adapter.MusicLibraryPagerAdapter;
-import com.kabouzeid.gramophone.dialogs.CreatePlaylistDialog;
 import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
 import com.kabouzeid.gramophone.interfaces.CabHolder;
 import com.kabouzeid.gramophone.loader.SongLoader;
@@ -124,10 +123,6 @@ public class LibraryFragment extends AbsMainActivityFragment implements CabHolde
         return pagerAdapter.getFragment(pager.getCurrentItem());
     }
 
-    private boolean isPlaylistPage() {
-        return pager.getCurrentItem() == MusicLibraryPagerAdapter.MusicFragments.PLAYLIST.ordinal();
-    }
-
     @NonNull
     @Override
     public MaterialCab openCab(final int menuRes, final MaterialCab.Callback callback) {
@@ -157,9 +152,6 @@ public class LibraryFragment extends AbsMainActivityFragment implements CabHolde
         super.onCreateOptionsMenu(menu, inflater);
         if (pager == null) return;
         inflater.inflate(R.menu.menu_main, menu);
-        if (isPlaylistPage()) {
-            menu.add(0, R.id.action_new_playlist, 0, R.string.new_playlist_title);
-        }
         Fragment currentFragment = getCurrentFragment();
         if (currentFragment instanceof AbsLibraryPagerRecyclerViewCustomGridSizeFragment && currentFragment.isAdded()) {
             AbsLibraryPagerRecyclerViewCustomGridSizeFragment absLibraryRecyclerViewCustomGridSizeFragment = (AbsLibraryPagerRecyclerViewCustomGridSizeFragment) currentFragment;
@@ -209,9 +201,6 @@ public class LibraryFragment extends AbsMainActivityFragment implements CabHolde
         switch (id) {
             case R.id.action_shuffle_all:
                 MusicPlayerRemote.openAndShuffleQueue(SongLoader.getAllSongs(getActivity()), true);
-                return true;
-            case R.id.action_new_playlist:
-                CreatePlaylistDialog.create().show(getChildFragmentManager(), "CREATE_PLAYLIST");
                 return true;
             case R.id.action_search:
                 startActivity(new Intent(getActivity(), SearchActivity.class));

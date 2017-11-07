@@ -10,6 +10,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.model.Song;
+import com.kabouzeid.gramophone.model.SongList;
 import com.kabouzeid.gramophone.util.MusicUtil;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class DeleteSongsDialog extends DialogFragment {
     public static DeleteSongsDialog create(ArrayList<Song> songs) {
         DeleteSongsDialog dialog = new DeleteSongsDialog();
         Bundle args = new Bundle();
-        args.putParcelableArrayList("songs", songs);
+        args.putParcelable("songs", SongList.fromSongList(songs));
         dialog.setArguments(args);
         return dialog;
     }
@@ -39,7 +40,8 @@ public class DeleteSongsDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         //noinspection unchecked
-        final ArrayList<Song> songs = getArguments().getParcelableArrayList("songs");
+        final SongList songList = getArguments().getParcelable("songs");
+        final ArrayList<Song> songs = songList.fetchSongs(this.getContext());
         int title;
         CharSequence content;
         if (songs.size() > 1) {

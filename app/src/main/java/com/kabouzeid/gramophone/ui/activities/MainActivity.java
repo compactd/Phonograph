@@ -41,7 +41,6 @@ import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
 import com.kabouzeid.gramophone.helper.SearchQueryHelper;
 import com.kabouzeid.gramophone.loader.AlbumLoader;
 import com.kabouzeid.gramophone.loader.ArtistSongLoader;
-import com.kabouzeid.gramophone.loader.PlaylistSongLoader;
 import com.kabouzeid.gramophone.model.Song;
 import com.kabouzeid.gramophone.service.MusicService;
 import com.kabouzeid.gramophone.ui.activities.base.AbsSlidingMusicPanelActivity;
@@ -402,11 +401,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
         } else if (MediaStore.Audio.Playlists.CONTENT_TYPE.equals(mimeType)) {
             final int id = (int) parseIdFromIntent(intent, "playlistId", "playlist");
             if (id >= 0) {
-                int position = intent.getIntExtra("position", 0);
-                ArrayList<Song> songs = new ArrayList<>();
-                songs.addAll(PlaylistSongLoader.getPlaylistSongList(this, id));
-                MusicPlayerRemote.openQueue(songs, position, true);
-                handled = true;
+                throw new Error("not implemented");
             }
         } else if (MediaStore.Audio.Albums.CONTENT_TYPE.equals(mimeType)) {
             final int id = (int) parseIdFromIntent(intent, "albumId", "album");

@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.PopupMenu;
 
 import com.kabouzeid.gramophone.R;
-import com.kabouzeid.gramophone.dialogs.AddToPlaylistDialog;
 import com.kabouzeid.gramophone.dialogs.DeleteSongsDialog;
 import com.kabouzeid.gramophone.dialogs.SongDetailDialog;
 import com.kabouzeid.gramophone.helper.MusicPlayerRemote;
@@ -36,9 +35,6 @@ public class SongMenuHelper {
                 return true;
             case R.id.action_delete_from_device:
                 DeleteSongsDialog.create(song).show(activity.getSupportFragmentManager(), "DELETE_SONGS");
-                return true;
-            case R.id.action_add_to_playlist:
-                AddToPlaylistDialog.create(song).show(activity.getSupportFragmentManager(), "ADD_PLAYLIST");
                 return true;
             case R.id.action_play_next:
                 MusicPlayerRemote.playNext(song);

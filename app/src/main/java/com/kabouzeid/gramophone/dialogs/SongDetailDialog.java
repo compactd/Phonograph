@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.kabouzeid.gramophone.R;
 import com.kabouzeid.gramophone.model.Song;
+import com.kabouzeid.gramophone.model.SongList;
 import com.kabouzeid.gramophone.util.MusicUtil;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -39,7 +40,7 @@ public class SongDetailDialog extends DialogFragment {
     public static SongDetailDialog create(Song song) {
         SongDetailDialog dialog = new SongDetailDialog();
         Bundle args = new Bundle();
-        args.putParcelable("song", song);
+        args.putParcelable("song", new SongList(song.id));
         dialog.setArguments(args);
         return dialog;
     }
@@ -58,7 +59,8 @@ public class SongDetailDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Activity context = getActivity();
-        final Song song = getArguments().getParcelable("song");
+        final Song song = ((SongList) getArguments().getParcelable("song"))
+                .fetchSongs(this.getContext()).get(0);
 
         MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .customView(R.layout.dialog_file_details, true)
